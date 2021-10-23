@@ -2,6 +2,24 @@
 #define _htable
 #include "list.hpp"
 
+
+struct HashElement{
+
+    // This is a struct that will hold the data of the element
+    // as well as the key with which it was inserted
+    // These structs are created and deleted automatically by the HashTable
+
+    void * data;
+    int key;
+
+    HashElement(void * d, int k){
+        // Add the data to the struct
+        data = d;
+        key = k;
+    };
+
+};
+
 class HashTable{
 
     // This is a generic hashtable with integer keys
@@ -31,7 +49,7 @@ class HashTable{
         int getElems();
         int getSize();
 
-}
+};
 
 
 #endif

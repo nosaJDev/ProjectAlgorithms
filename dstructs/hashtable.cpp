@@ -18,7 +18,15 @@ HashTable::HashTable(int _size){
 HashTable::~HashTable(){
     // Deletes all the chains and the array
 
+    // Delete all the HashElement structs and the lists
     for(int i = 0; i < size; i++){
+
+        // Delete all of the HashElement structs
+        for(int j = 0; j < array[i]->getElems(); j++){
+            HashElement * he = (HashElement *) array[i]->get(j);
+            delete he;
+        }
+
         delete array[i];
     }
 
@@ -26,7 +34,7 @@ HashTable::~HashTable(){
 
 }
 
-HashTable::add(void * elem, int key){
+void HashTable::add(void * elem, int key){
     // Adds an element under a specific key
 
     // Ignore negative keys
@@ -37,11 +45,10 @@ HashTable::add(void * elem, int key){
     int pos = key % size;
 
     // Add the element to the approrpiate chain
-    array[pos]->add(elem);
+    array[pos]->add(new HashElement(elem, key));
 
     // Increase the element counter
     elems++;
-
 
 }
 

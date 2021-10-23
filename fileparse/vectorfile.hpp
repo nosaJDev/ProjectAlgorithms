@@ -16,8 +16,12 @@ class VectorFile{
 
     public:
 
-        VectorFile(const char *);
+        VectorFile(const char *,int);
         ~VectorFile();
+
+        // Getters
+        List * getNameList();
+        List * getVectorList();
 
 
 }
