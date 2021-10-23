@@ -56,3 +56,15 @@ void Vector::setCoord(int pos, double value){
     coords[pos] = value;
 
 }
+
+double Vector::dotProduct(Vector * other){
+    // Calculates and returns the dot product of this vector
+    // with another one. Assumes that the sizes match
+
+    double res = 0.0;
+    for(int i = 0; i < size; i++){
+        res += coords[i]*other->coords[i];
+    }
+    return res;
+
+}

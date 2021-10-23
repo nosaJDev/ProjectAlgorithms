@@ -24,6 +24,9 @@ class Vector{
         double getCoord(int);
         void setCoord(int, double);
 
+        // Math operations
+        double dotProduct(Vector *);
+
 
 };
 
