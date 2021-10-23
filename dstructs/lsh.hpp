@@ -28,6 +28,7 @@ class LSH{
         int ** hash_ids;
 
         // Internal functions for handling vectors
+        int getVectorMasterKey(int, Vector *);
         void placeVectorToBucket(int, Vector *);
 
         // A random offset for controlled random values
@@ -38,13 +39,24 @@ class LSH{
         Vector ** hashvectors;
         double * hasht;
 
+        // Metric for queries
+        Metric * metric;
+
+        // Bookkeeping for inserted vectors
+        int elems;
+
 
     public:
 
-        LSH(int, int,int,int);
+        LSH(int, int,int,int, Metric *);
         ~LSH();
 
+        // This is the preprocessing step
         void addVectorList(List *);
+
+        // These are methods for performing queries
+        Vector ** approximatekNN(int, Vector *);
+        Vector ** approximateRange(double, Vector *);
 
 
 };

@@ -42,6 +42,7 @@ class HashTable{
 
         // Operators
         void add(void *, int);
+        bool exists(void *, int);
         List * getChain(int);
         List ** getAllChains();
 

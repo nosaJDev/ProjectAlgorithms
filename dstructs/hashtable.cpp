@@ -52,6 +52,30 @@ void HashTable::add(void * elem, int key){
 
 }
 
+bool HashTable::exists(void * elem, int key){
+    // Checks and return wether the element is already present on the
+    // hash table under the bucket of the key provided
+
+    // Find the bucket at the key position
+    List * bucket = getChain(key);
+
+    // Search to find the element
+    for(int i = 0; i < bucket->getElems(); i++){
+        HashElement * el_at = (HashElement*) bucket->get(i);
+
+        // Check if it's the same element
+        if (el_at->data == elem){
+            // If it is, return true
+            return true;
+        }
+
+    }
+
+    // If you don't find it return false
+    return false;
+
+}
+
 List * HashTable::getChain(int key){
     // Finds and return the chain of the corresponding key
 

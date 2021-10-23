@@ -10,6 +10,8 @@ PriorityQueue::PriorityQueue(int _size){
     // Size + 1 because it's easier for adding elements
     array = new QueueElement*[size+1];
 
+    // Initiate the hash table for double checking
+    double_check = new HashTable(size);
 
 
 }
@@ -22,6 +24,16 @@ PriorityQueue::~PriorityQueue(){
     }
     delete[] array;
 
+    // Delete the hash table for double checking
+    delete double_check;
+
+}
+
+int PriorityQueue::getElems(){
+
+    // Returns the number of elements currently in the queue
+    return elems;
+
 }
 
 void PriorityQueue::add(void * elem, double priority){
@@ -29,7 +41,16 @@ void PriorityQueue::add(void * elem, double priority){
     // This will add an element to the priority queue
     // Elements that do not fit will be deleted.
 
-    // First add the element to the last spot
+    // First, check if the element is already present on the priority queue
+    if( double_check->exists(elem, (int) elem)){
+        // If it exists, then don't add it again
+        return;
+    }
+
+    // If it does not exist, mark it as added on the double checker
+    double_check->add(elem, (int) elem);
+
+    // Add the element to the last spot
     array[elems] = new QueueElement(elem,priority);
 
     // Then perform swapping to get it to the correct spot

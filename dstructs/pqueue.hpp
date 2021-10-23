@@ -1,5 +1,6 @@
 #ifndef _pqueue
 #define _pqueue
+#include "hashtable.hpp"
 
 struct QueueElement{
 
@@ -17,7 +18,9 @@ struct QueueElement{
 class PriorityQueue{
 
     // This is a priority queue that is implemented with an array.
-    
+    // The queue also has support for detecting and not adding same elements twice
+    // This behavior is achieved with a hash table
+
     private:
 
         int size; // The total size of the array
@@ -25,11 +28,17 @@ class PriorityQueue{
         
         QueueElement ** array; // The array that holds all the elements
 
+        // The hash table for double checking
+        HashTable * double_check;
+
     public:
 
         // Con/destructor
         PriorityQueue(int);
         ~PriorityQueue();
+
+        // Getters
+        int getElems();
 
         // Operators
         void add(void*,double);
