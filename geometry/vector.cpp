@@ -49,7 +49,7 @@ void Vector::setCoord(int pos, double value){
     // If out of bounds, do nothing
     // This may change to increase the size of the vector
     if(pos < 0 || pos > size){
-        return
+        return;
     }
 
     // If within bounds, set the appropriate coord

@@ -24,6 +24,6 @@ class VectorFile{
         List * getVectorList();
 
 
-}
+};
 
 #endif

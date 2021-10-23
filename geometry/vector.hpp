@@ -17,7 +17,7 @@ class Vector{
 
         // Con/destructor
         Vector(int, double *);
-        ~Vector()
+        ~Vector();
 
         // Getters and setters
         int getSize();
@@ -25,6 +25,6 @@ class Vector{
         void setCoord(int, double);
 
 
-}
+};
 
 #endif
