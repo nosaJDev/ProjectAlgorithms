@@ -18,6 +18,7 @@ class LSH{
         int k; // This will determine how many h() functions will be used
         int w; // This is the window that is used throughout the algorithm
         int numBuckets; // This will determine how many buckets per hash table
+        int dimension; // This will determine the size of the vectors used
 
         // The hash function generator
         LocalityHashFamily * hashfunc;
@@ -41,15 +42,15 @@ class LSH{
 
     public:
 
-        LSH(int, int,int,int, Metric *);
+        LSH(int, int,int,int,int);
         ~LSH();
 
         // This is the preprocessing step
         void addVectorList(List *);
 
         // These are methods for performing queries
-        Vector ** approximatekNN(int, Vector *);
-        Vector ** approximateRange(double, Vector *);
+        Vector ** approximatekNN(int, Vector *, Metric *);
+        Vector ** approximateRange(double, Vector *, Metric *);
 
 
 };
