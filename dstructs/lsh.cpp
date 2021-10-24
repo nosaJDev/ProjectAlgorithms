@@ -4,77 +4,8 @@
 #include <ctime>
 #include "pqueue.hpp"
 
-double boxMulerNormal(double * n1, double * n2){
-    // This helper function will generate two variables following
-    // the standard normal distribution by using the box-muller method
 
-    // First, generate the two uniform distributed variables
-    double u1 = 1.0*rand()/RAND_MAX;
-    double u2 = 1.0*rand()/RAND_MAX;
-
-    // Then, calculate the normal variables
-    double common = -2*sqrt(log(u1));
-    *n1 = common*cos(2*M_PI*u2);
-    *n2 = common*sin(2*M_PI*u2);
-
-}
-
-
-int LSH::h(int id, Vector * v){
-    // This is a single hash function that will return an integer for
-    // a vector. Argument id determines which one is used.
-
-    // The function differenciates by seeding the rnJesus with the id
-    srand(id);
-
-
-    // Then, check if you already have a vector cached for this hfunction
-    // Otherwise create it now, and do the same for the value
-    Vector * randvec;
-    double t;
-    if (hashvectors[id] == nullptr){
-
-        randvec = new Vector(v->getSize(),nullptr);
-        for(int i = 0; i < randvec->getSize()/2; i++){
-            // Fetch two random coordinates
-            double c1, c2;
-            boxMulerNormal(&c1, &c2);
-            randvec->setCoord(2*i,c1);
-            randvec->setCoord(2*i+1,c2);
-        }
-
-        // Check if one coord is missing
-        if (randvec->getSize() % 2){
-            // Fetch this one as well
-            double c;
-            boxMulerNormal(&c,&c);
-            randvec->setCoord(randvec->getSize()-1,c);
-        }
-
-        // Also generate the value for t
-        t = w*rand()/RAND_MAX;
-
-        // Save both values to the cache
-        hashvectors[id] = randvec;
-        hasht[id] = t;
-
-    }else{
-
-        // If the values exist on the cache, just grab em
-        randvec = hashvectors[id];
-        t = hasht[id];
-
-    }
-
-    // Finally produce the key using the known formula
-    int key = (int) floor(1.0*(randvec->dotProduct(v)+t)/w);
-
-    // Return the key you produced
-    return key;
-
-}
-
-LSH::LSH(int _L, int _k,int _w, int buckets, Metric * _met){
+LSH::LSH(int _L, int _k,int _w, int buckets, int dim){
 
     // This will initialize the LSH, setting parameters and initiating data structures
 
@@ -83,7 +14,7 @@ LSH::LSH(int _L, int _k,int _w, int buckets, Metric * _met){
     k = _k;
     w = _w;
     numBuckets = buckets;
-    metric = _met;
+    dimension = dim;
 
     // Reset the inserted vectors counter
     elems = 0;
@@ -98,6 +29,10 @@ LSH::LSH(int _L, int _k,int _w, int buckets, Metric * _met){
         tables[i] = new HashTable(numBuckets);
     }
 
+    // Initiate the hash function generator
+    int maxhashes = 50;
+    hashfunc = new LocalityHashFamily(maxhashes, dimension, w);
+
     // Choose which hash functions will accomodate each level
     hash_ids = new int*[L];
     for(int i = 0; i < L; i++){
@@ -110,14 +45,6 @@ LSH::LSH(int _L, int _k,int _w, int buckets, Metric * _met){
             hash_ids[i][j] = rand() % maxhashes;
         }
     }
-
-    // Initialize the cached values for the hashes
-    hashvectors = new Vector*[maxhashes];
-    hasht = new double[maxhashes];
-    for(int i = 0; i < maxhashes; i++){
-        hashvectors[i] = nullptr;
-    }
-
 
 }
 
@@ -135,13 +62,8 @@ LSH::~LSH(){
     }
     delete[] hash_ids;
 
-    // Delete the cached values for vectors and t.
-    for(int i = 0; i < maxhashes; i++){
-        if(hashvectors[i] != nullptr)
-            delete hashvectors[i];
-    }
-    delete[] hashvectors;
-    delete[] hasht;
+    // Delete the hash function generator
+    delete hashfunc;
 
 }
 
@@ -162,7 +84,7 @@ int LSH::getVectorMasterKey(int level, Vector * v){
     // Finally add the hash values together
     int res = 0;
     for(int i = 0; i < k; i++){
-        res += (h(hash_ids[level][i],v)*rands[i])  % M;
+        res += (hashfunc->hash(hash_ids[level][i],v)*rands[i])  % M;
     }
     
     // Produce the key and return it
@@ -203,7 +125,7 @@ void LSH::addVectorList(List * vectorlist){
 
 }
 
-Vector ** LSH::approximatekNN(int kappa, Vector * q){
+Vector ** LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
 
     // This will look up the buckets, and return the kappa nearest neigbors
 
@@ -256,7 +178,7 @@ Vector ** LSH::approximatekNN(int kappa, Vector * q){
 }
 
 
-Vector ** LSH::approximateRange(double radius, Vector * q){
+Vector ** LSH::approximateRange(double radius, Vector * q, Metric * metric){
 
     // This will look up the buckets, and return all the vectors at a range
 

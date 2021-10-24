@@ -4,6 +4,7 @@
 #include "../geometry/vector.hpp"
 #include "../dstructs/list.hpp"
 #include "../dstructs/hashtable.hpp"
+#include "hashfunc.hpp"
 
 class LSH{
 
@@ -18,8 +19,8 @@ class LSH{
         int w; // This is the window that is used throughout the algorithm
         int numBuckets; // This will determine how many buckets per hash table
 
-        // The hash function family used for generating the "small" keys
-        int h(int, Vector *);
+        // The hash function generator
+        LocalityHashFamily * hashfunc;
 
         // The array of the hashtables that store the points
         HashTable ** tables;
@@ -33,14 +34,6 @@ class LSH{
 
         // A random offset for controlled random values
         int rand_offset;
-
-        // Cashing of vectors and t values to avoid recalculation
-        int maxhashes = 50; // How many different hash functions are used
-        Vector ** hashvectors;
-        double * hasht;
-
-        // Metric for queries
-        Metric * metric;
 
         // Bookkeeping for inserted vectors
         int elems;
