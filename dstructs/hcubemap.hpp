@@ -3,6 +3,8 @@
 #include "../geometry/vector.hpp"
 #include "hashfunc.hpp"
 #include "hashtable.hpp"
+#include "metric.hpp"
+#include "pqueue.hpp"
 
 class HypercubeMapping{
 
@@ -25,6 +27,7 @@ class HypercubeMapping{
         HashTable * table;
 
         // Internal operations
+        int findVectorCubeKey(Vector *);
         void mapVectorToCube(Vector *);
 
     public:
@@ -35,6 +38,10 @@ class HypercubeMapping{
 
         // This is the preprocessing step
         void addVectorList(List *);
+
+        // These are methods for performing queries
+        PriorityQueue * approximatekNN(int, Vector *, Metric *,int = 1);
+        PriorityQueue * approximateRange(double, Vector *, Metric *, int = 1);
 
 
 };

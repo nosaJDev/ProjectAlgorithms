@@ -49,8 +49,8 @@ class LSH{
         void addVectorList(List *);
 
         // These are methods for performing queries
-        Vector ** approximatekNN(int, Vector *, Metric *);
-        Vector ** approximateRange(double, Vector *, Metric *);
+        PriorityQueue * approximatekNN(int, Vector *, Metric *);
+        PriorityQueue * approximateRange(double, Vector *, Metric *);
 
 
 };

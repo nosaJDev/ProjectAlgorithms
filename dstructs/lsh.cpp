@@ -125,7 +125,7 @@ void LSH::addVectorList(List * vectorlist){
 
 }
 
-Vector ** LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
+PriorityQueue * LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
 
     // This will look up the buckets, and return the kappa nearest neigbors
 
@@ -161,24 +161,14 @@ Vector ** LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
 
     }
 
-    // After you are done, the queue will contain at most kappa instances
-    // Copy them back on a new array
-    Vector ** ret_vecs = new Vector*[queue->getElems()];
-    QueueElement ** queue_elems = queue->getArray();
-    for(int i = 0; i < queue->getElems();i++){
-        ret_vecs[i] = (Vector*) queue_elems[i]->data;
-    }
+    // Return the queue with all the elements
+    // This must be deleted outside this function
+    return queue;
 
-    // Delete the priority queue (no longer needed)
-    delete queue;
-
-    // Return the retrieved vectors
-    return ret_vecs;
 
 }
 
-
-Vector ** LSH::approximateRange(double radius, Vector * q, Metric * metric){
+PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric){
 
     // This will look up the buckets, and return all the vectors at a range
 
@@ -217,18 +207,8 @@ Vector ** LSH::approximateRange(double radius, Vector * q, Metric * metric){
 
     }
 
-    // After you are done, the queue will contain at most kappa instances
-    // Copy them back on a new array
-    Vector ** ret_vecs = new Vector*[queue->getElems()];
-    QueueElement ** queue_elems = queue->getArray();
-    for(int i = 0; i < queue->getElems();i++){
-        ret_vecs[i] = (Vector*) queue_elems[i]->data;
-    }
-
-    // Delete the priority queue (no longer needed)
-    delete queue;
-
-    // Return the retrieved vectors
-    return ret_vecs;
+    // Return the queue with all the elements
+    // This must be deleted outside this function
+    return queue;
 
 }
