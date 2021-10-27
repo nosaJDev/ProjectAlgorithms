@@ -20,6 +20,7 @@ class PriorityQueue{
     // This is a priority queue that is implemented with an array.
     // The queue also has support for detecting and not adding same elements twice
     // This behavior is achieved with a hash table
+    // The priority queue will grow on demand.
 
     private:
 
@@ -30,6 +31,9 @@ class PriorityQueue{
 
         // The hash table for double checking
         HashTable * double_check;
+
+        // Internal function for growing the array if more space is needed
+        void doubleArray();
 
     public:
 

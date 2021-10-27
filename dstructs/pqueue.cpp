@@ -29,6 +29,32 @@ PriorityQueue::~PriorityQueue(){
 
 }
 
+void PriorityQueue::doubleArray(){
+    // This will double the array space
+    // it is needed for when there is no more space but we are adding elements
+
+    // Get the new size and the new array
+    int newsize = 2*size;
+    QueueElement ** newarray = new QueueElement*[newsize];
+
+    // Copy the elements to the new array
+    for(int i = 0; i < elems; i++){
+        newarray[i] = array[i];
+    }
+    
+    // Set the rest elements to null
+    for(int i = elems; i < newsize; i++){
+        newarray[i] = nullptr;
+    }
+
+    // Delete the old array and reset the size
+    delete[] array;
+    array =  newarray;
+    size = newsize;
+
+
+}
+
 int PriorityQueue::getElems(){
 
     // Returns the number of elements currently in the queue
@@ -49,6 +75,10 @@ void PriorityQueue::add(void * elem, double priority){
 
     // If it does not exist, mark it as added on the double checker
     double_check->add(elem, (int) elem);
+
+    // Check if you need to double the space to fit
+    if (elems == size)
+        doubleArray();
 
     // Add the element to the last spot
     array[elems] = new QueueElement(elem,priority);

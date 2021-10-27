@@ -11,7 +11,6 @@ class VectorFile{
     private:
 
         // Lists for storing the vector and naming
-        List * name_list;
         List * vector_list;
 
     public:
@@ -20,7 +19,6 @@ class VectorFile{
         ~VectorFile();
 
         // Getters
-        List * getNameList();
         List * getVectorList();
 
 
