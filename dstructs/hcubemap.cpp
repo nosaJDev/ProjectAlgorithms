@@ -1,4 +1,19 @@
 #include "hcubemap.hpp"
+#include <cstdlib>
+
+int f(int func_id, int value){
+    // This is an implementation of the family of f functions
+    // guarranteeing uniform zero/ones on each bucket, while
+    // also staying the same when given the same id
+
+    // Seed the rand with the number plus the id
+    srand(func_id+value);
+    
+    // Generate and return the random bit
+    return rand() % 2;
+
+}
+
 
 int * inclusiveHamming(int number, int bits, int dist, HashTable * ht = nullptr){
 
@@ -119,8 +134,8 @@ int HypercubeMapping::findVectorCubeKey(Vector * v){
         // Find the value for the i-th hash
         int i_value = hashfunc->hash(i,v);
 
-        // Convert it to a bit
-        int i_bit = i_value % 2 ==0;
+        // Convert it to a bit using the f function
+        int i_bit = f(i,i_value);
 
         // Add it to the key and bitswift
         key = (key << 2)+i_bit;
