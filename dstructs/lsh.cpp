@@ -185,7 +185,7 @@ Vector ** LSH::approximateRange(double radius, Vector * q, Metric * metric){
     // First create a priority queue to hold the potentials
     // It must be able to hold as many elements as there are
     // This may change to put a limit and save ourselves
-    PriorityQueue * queue = new PriorityQueue(elems);
+    PriorityQueue * queue = new PriorityQueue(2+elems/8);
 
     // Then, search the correct bucket for each level
     for(int l = 0; l < L; l++){

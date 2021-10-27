@@ -7,8 +7,8 @@ PriorityQueue::PriorityQueue(int _size){
     size = _size;
     elems = 0;
     
-    // Size + 1 because it's easier for adding elements
-    array = new QueueElement*[size+1];
+    // Size + 2 because it's easier for adding elements
+    array = new QueueElement*[size+2];
 
     // Initiate the hash table for double checking
     double_check = new HashTable(size);
@@ -81,12 +81,12 @@ void PriorityQueue::add(void * elem, double priority){
         doubleArray();
 
     // Add the element to the last spot
-    array[elems] = new QueueElement(elem,priority);
+    array[elems+1] = new QueueElement(elem,priority);
 
     // Then perform swapping to get it to the correct spot
-    int spot_at = elems;
-    QueueElement * my_elem = array[elems];
-    while(spot_at != 0){
+    int spot_at = elems+1;
+    QueueElement * my_elem = array[elems+1];
+    while(spot_at > 1){
 
         // Get the contesting element
         QueueElement * other = array[spot_at/2];
@@ -127,7 +127,7 @@ void * PriorityQueue::peek(){
         return nullptr;
 
     // If it's not empty return the first one
-    return array[0]->data;
+    return array[1]->data;
 
 }
 
@@ -140,15 +140,15 @@ void * PriorityQueue::remove(){
         return nullptr;
 
     // If it's not, get the element you will be returning
-    void * ret_elem = array[0]->data;
+    void * ret_elem = array[1]->data;
 
     // Delete the corresponding QueueElement struct
-    delete array[0];
+    delete array[1];
 
     // Replace with the last element and perform descend
-    array[0] = array[elems-1];
-    array[elems-1] = nullptr;
-    int spot_at = 0;
+    array[1] = array[elems];
+    array[elems] = nullptr;
+    int spot_at = 1;
     while(true){
 
         int down_spot = -1;
