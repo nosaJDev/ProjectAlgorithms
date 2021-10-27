@@ -1,7 +1,7 @@
 #include "vector.hpp"
+#include <cstring>
 
-
-Vector::Vector(int _size, double * values = nullptr){
+Vector::Vector(int _size, double * values = nullptr, char * _label = nullptr){
     // Creates a vector, sets the size and adds initial values
 
     size = _size;
@@ -17,11 +17,22 @@ Vector::Vector(int _size, double * values = nullptr){
         }
     }
 
+    // Set the label if one is provided
+    label = nullptr;
+    if ( _label != nullptr){
+        label = new char[strlen(_label)+1];
+        strcpy(label,_label);
+    }
+
 }
 
 Vector::~Vector(){
     // Deletes the coords array
     delete[] coords;
+
+    // Delete the label if there was one
+    if (label != nullptr)
+        delete[] label;
 
 }
 
@@ -55,6 +66,11 @@ void Vector::setCoord(int pos, double value){
     // If within bounds, set the appropriate coord
     coords[pos] = value;
 
+}
+
+char * Vector::getLabel(){
+    // Returns the name of this specific vector
+    return label;
 }
 
 double Vector::dotProduct(Vector * other){

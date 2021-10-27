@@ -12,17 +12,19 @@ class Vector{
         // Coordinates and dimensions
         double * coords;
         int size;
+        char * label;
     
     public:
 
         // Con/destructor
-        Vector(int, double *);
+        Vector(int, double * = nullptr, char * = nullptr);
         ~Vector();
 
         // Getters and setters
         int getSize();
         double getCoord(int);
         void setCoord(int, double);
+        char * getLabel();
 
         // Math operations
         double dotProduct(Vector *);
