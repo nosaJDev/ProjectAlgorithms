@@ -1,6 +1,6 @@
-#include "listnode.hpp"
+#include "list.hpp"
 
-ListNode::ListNode(void * _next = nullptr, void * _data = nullptr){
+ListNode::ListNode(ListNode * _next = nullptr, void * _data = nullptr){
 
     //Set the variables of the node
     next = _next;
@@ -57,20 +57,8 @@ List::List(){
 
 List::~List(){
 
-    // Deletes all the list nodes iteratively
-    for(ListNode * at = head; at != nullptr;){
-
-        // Get the node you are about to delete
-        ListNode * todelete = at;
-
-        // Seek the next node before the detatchment
-        at = at->getNext();
-
-        // Detatch and delete the node
-        todelete->setNext(nullptr);
-        delete todelete;
-
-    }
+    // Resets the list before deletion
+    reset();
 
 }
 
@@ -115,6 +103,37 @@ void * List::get(int pos){
     // Return the result of the iterator
     return iter_node->getData();
 
+
+}
+
+void List::reset(){
+    
+    // This will empty the list of nodes but leave the rest intact for further use
+    
+    // Deletes all the list nodes iteratively
+    for(ListNode * at = head; at != nullptr;){
+
+        // Get the node you are about to delete
+        ListNode * todelete = at;
+
+        // Seek the next node before the detatchment
+        at = at->getNext();
+
+        // Detatch and delete the node
+        todelete->setNext(nullptr);
+        delete todelete;
+
+    }
+
+    // Set the head and iterator appropriately
+    head = nullptr;
+    iter_at = -1;
+    iter_node = nullptr;
+
+    // Reset the size back to zero
+    elems = 0;
+
+    
 
 }
 

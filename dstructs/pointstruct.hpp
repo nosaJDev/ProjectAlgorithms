@@ -14,6 +14,9 @@ class PointStruct{
 
     public:
 
+        // Make the destructor virtual to avoid cataclysmic failure
+        virtual ~PointStruct();
+
         // This is the preprocessing step
         virtual void addVectorList(List *) = 0;
 
@@ -24,7 +27,7 @@ class PointStruct{
 
 
 
-}
+};
 
 
 #endif

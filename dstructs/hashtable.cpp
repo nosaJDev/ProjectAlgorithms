@@ -99,6 +99,30 @@ List ** HashTable::getAllChains(){
 
 }
 
+void HashTable::reset(){
+
+    // This will remove all the elements but will leave the
+    // structures intact for reuse
+
+    for(int i = 0; i < size; i++){
+        // Check every bucket for elements
+        List * buck = array[i];
+        if (buck->getElems() > 0){
+            // Loop through and delete elements
+            for(int j = 0; j < buck->getElems(); j++){
+                HashElement * el = (HashElement*) buck->get(j);
+                delete el;
+            }
+
+            // Empty the list afterward
+            buck->reset();
+        }
+
+    }
+
+
+}
+
 
 int HashTable::getElems(){
     // Returns the number of elements in the chain

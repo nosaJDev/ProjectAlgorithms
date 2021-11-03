@@ -45,10 +45,13 @@ class HashTable{
         bool exists(void *, int);
         List * getChain(int);
         List ** getAllChains();
+        void reset();
 
         // Sizes and such
         int getElems();
         int getSize();
+
+
 
 };
 

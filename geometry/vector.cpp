@@ -24,6 +24,11 @@ Vector::Vector(int _size, double * values = nullptr, char * _label = nullptr){
         strcpy(label,_label);
     }
 
+    // Set variables used in clustering
+    cluster = -1;
+    clusterdist = 0;
+
+
 }
 
 Vector::~Vector(){
@@ -82,5 +87,30 @@ double Vector::dotProduct(Vector * other){
         res += coords[i]*other->coords[i];
     }
     return res;
+
+}
+
+void Vector::paste(Vector * other){
+
+    // This will copy the coords of the other vector into this one
+    for(int i = 0; i < size; i++){
+        coords[i] = other->coords[i];
+    }
+
+}
+
+bool Vector::addPossibleCluster(int clust, double cdist){
+
+    // Adds a possible cluster based on distance
+    // Returns wether this was a first assignment
+
+    bool ret = cluster == -1;
+    if (ret || cdist < clusterdist){
+        
+        cluster = clust;
+        clusterdist = cdist;
+    }
+
+    return ret;
 
 }

@@ -13,6 +13,10 @@ class Vector{
         double * coords;
         int size;
         char * label;
+
+        // These are used in clustering
+        int cluster;
+        double clusterdist;
     
     public:
 
@@ -28,6 +32,13 @@ class Vector{
 
         // Math operations
         double dotProduct(Vector *);
+
+        // Other operations
+        void paste(Vector *);
+
+        // Operations used in range clustering
+        bool addPossibleCluster(int, double);
+        int getCluster();
 
 
 };

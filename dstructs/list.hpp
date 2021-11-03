@@ -12,12 +12,12 @@ class ListNode{
         void * data;
 
         // The pointer to the next node
-        void * next;
+        ListNode * next;
     
     public:
 
         // Con/destructors
-        ListNode(void *, void *);
+        ListNode(ListNode *, void *);
         ~ListNode();
 
         // Getters and setters
@@ -57,6 +57,7 @@ class List{
         // Operations of the list
         void add(void *);
         void * get(int);
+        void reset();
 
         // Getters/Setters
         int getElems();
