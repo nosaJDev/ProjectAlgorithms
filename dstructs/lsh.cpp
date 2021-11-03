@@ -125,6 +125,53 @@ void LSH::addVectorList(List * vectorlist){
 
 }
 
+Vector * LSH::approximateNN( Vector * q, Metric * metric){
+
+    // This will look up the buckets, and return the kappa nearest neigbors
+
+    // First create the variables that will hold the nn
+    Vector * nn = nullptr;
+    double mindist = 999999;
+
+
+    // Then, search the correct bucket for each level
+    for(int l = 0; l < L; l++){
+        
+        // Find the master key for vector q on that level
+        int master_key = getVectorMasterKey(l, q);
+
+        // Then retrieve the bucket list for that key
+        List * bucketlist = tables[l]->getChain(master_key);
+
+        // Loop through the vectors and choose the ones with correct locality
+        for(int i = 0; i < bucketlist->getElems(); i++){
+
+            // Skip the ones with different keys
+            HashElement * elem = (HashElement*)bucketlist->get(i);
+            if(elem->key != master_key)
+                continue;
+
+            // Retrieve the vector and find the distance with the metric
+            Vector * v = (Vector *) elem->data;
+            double d = metric->dist(v,q);
+
+            // Check if you need to replace the NN
+            if ( mindist > d){
+                mindist = d;
+                nn = (Vector *) elem->data;
+            }
+        }
+
+    }
+
+    // Return the NN you found
+    return nn;
+
+
+}
+
+
+
 PriorityQueue * LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
 
     // This will look up the buckets, and return the kappa nearest neigbors

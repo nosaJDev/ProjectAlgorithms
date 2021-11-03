@@ -5,8 +5,9 @@
 #include "hashtable.hpp"
 #include "metric.hpp"
 #include "pqueue.hpp"
+#include "pointstruct.hpp"
 
-class HypercubeMapping{
+class HypercubeMapping: public PointStruct{
 
     // This class will sort the points according to the theory of hypercube
     // mapping.
@@ -40,8 +41,9 @@ class HypercubeMapping{
         void addVectorList(List *);
 
         // These are methods for performing queries
-        PriorityQueue * approximatekNN(int, Vector *, Metric *,int = 1);
-        PriorityQueue * approximateRange(double, Vector *, Metric *, int = 1);
+        Vector * approximateNN(Vector *,Metric *);
+        PriorityQueue * approximatekNN(int, Vector *, Metric *);
+        PriorityQueue * approximateRange(double, Vector *, Metric *);
 
 
 };

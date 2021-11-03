@@ -170,7 +170,57 @@ void HypercubeMapping::addVectorList(List * vlist){
 
 }
 
-PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric * metric, int hamming = 0){
+
+
+Vector * HypercubeMapping::approximateNN(Vector * q, Metric * metric){
+
+    // Get the hamming distance that you will check
+    int hamming = 0;
+
+    // First of all find the key of the vector to check
+    int qkey = findVectorCubeKey(q);
+
+    // Then retrieve the list of buckets to check according to hamming distance
+    int * bucks = inclusiveHamming(qkey,cubedims, hamming);
+
+    // After that, create the variables that will hold the nearest neighbor
+    Vector * nn;
+    double mindist = 9999999;
+
+    // Finally loop through those buckets to gather the nearest neighbors
+    for(int i = 1; i <= bucks[0]; i++){
+
+        // Retrieve the bucket we are searching in
+        List * bucket = table->getChain(bucks[i]);
+
+        // Loop through all the bucket elements
+        for(int j = 0; j < bucket->getElems(); j++){
+
+            // Find the element
+            HashElement * he = (HashElement *) bucket->get(j);
+
+            // Check if you are closer than the sofar NN
+            double d = metric->dist(q, (Vector *) he->data);
+            if ( mindist < d ){
+                // Replace the NN with the better one
+                mindist = d;
+                nn = (Vector *) he->data;
+            }
+        }
+
+    }
+
+    // After you are done, return the nearest neighbor
+    return nn;
+
+}
+
+
+
+PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric * metric){
+
+    // Get the hamming distance that you will check
+    int hamming = 0;
 
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);
@@ -207,7 +257,10 @@ PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric *
 }
 
 
-PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Metric * metric, int hamming = 0){
+PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Metric * metric){
+
+    // Get the hamming distance that you will check
+    int hamming = 0;
 
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);

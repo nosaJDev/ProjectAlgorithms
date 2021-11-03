@@ -5,8 +5,9 @@
 #include "../dstructs/list.hpp"
 #include "../dstructs/hashtable.hpp"
 #include "hashfunc.hpp"
+#include "pointstruct.hpp"
 
-class LSH{
+class LSH: public PointStruct{
 
     // This class will classify and distribute vectors to buckets
     // After that, it will support Aproximate kNN and range queries
@@ -49,6 +50,7 @@ class LSH{
         void addVectorList(List *);
 
         // These are methods for performing queries
+        Vector * approximateNN(Vector *,Metric *);
         PriorityQueue * approximatekNN(int, Vector *, Metric *);
         PriorityQueue * approximateRange(double, Vector *, Metric *);
 
