@@ -41,6 +41,9 @@ class Vector{
         int getCluster();
         void resetCluster();
 
+        // Used for debugging
+        void print();
+
 
 };
 

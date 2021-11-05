@@ -3,7 +3,7 @@
 #include <cmath>
 #include <ctime>
 #include "pqueue.hpp"
-
+#include <cstdio>
 
 LSH::LSH(int _L, int _k,int _w, int buckets, int dim){
 
@@ -30,7 +30,7 @@ LSH::LSH(int _L, int _k,int _w, int buckets, int dim){
     }
 
     // Initiate the hash function generator
-    int maxhashes = 50;
+    int maxhashes = 200;
     hashfunc = new LocalityHashFamily(maxhashes, dimension, w);
 
     // Choose which hash functions will accomodate each level
@@ -75,7 +75,7 @@ int LSH::getVectorMasterKey(int level, Vector * v){
     srand(rand_offset+level);
     int * rands = new int[k];
     for(int i = 0; i < k; i++){
-        rands[i] = -1000+rand()%2001;
+        rands[i] = -1+rand()%3;
     }
 
     // Then calculate the M value (nineth fibonacci prime)
@@ -84,11 +84,11 @@ int LSH::getVectorMasterKey(int level, Vector * v){
     // Finally add the hash values together
     int res = 0;
     for(int i = 0; i < k; i++){
-        res += (hashfunc->hash(hash_ids[level][i],v)*rands[i])  % M;
+        res += ((hashfunc->hash(hash_ids[level][i],v)*rands[i])  % M+M)%M;
     }
     
     // Produce the key and return it
-    return res % M;
+    return (res % M + M) % M;
 
 
 }

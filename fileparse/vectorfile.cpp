@@ -17,6 +17,24 @@ VectorFile::VectorFile(const char * filename, int dimension){
         printf("Could not open file");
     }
 
+    // Find out the correct dimension by reading the first line
+    dimension = 0;
+    bool lws = false;
+    while(true){
+        char c = fgetc(file);
+        if(c == '\t' || c == ' '){
+            lws = true;
+        }else{
+            if(lws && c >= '0' && c <= '9') dimension += 1;
+            lws = false;
+        }
+
+        if (c == '\n')
+            break;
+    }
+    printf("The dimensions are %d\n",dimension);
+    rewind(file);
+
     // Start reading the file
     int dims_read = 0; // How many dimensions have you read
     bool read_name = true; // Wether you are reading the label
@@ -72,6 +90,7 @@ VectorFile::~VectorFile(){
         delete (Vector *) vector_list->get(i);
 
     }
+    delete vector_list;
 
 }
 

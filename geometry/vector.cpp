@@ -1,5 +1,6 @@
 #include "vector.hpp"
 #include <cstring>
+#include <cstdio>
 
 Vector::Vector(int _size, double * values, char * _label){
     // Creates a vector, sets the size and adds initial values
@@ -126,5 +127,22 @@ void Vector::resetCluster(){
 
     // Resets the placement on the cluster
     cluster = -1;
+
+}
+
+void Vector::print(){
+
+    // Print out the vector
+    if(label != nullptr){
+        printf("[%s]: (",label);
+    }else{
+        printf("[no label]: (");
+    }
+    
+    //Print the dimensions
+    for(int i = 0; i < size; i++){
+        printf(" %.1lf%s",coords[i],(i == size-1)?"":",");
+    }
+    printf(")\n");
 
 }

@@ -1,6 +1,7 @@
 #include "hashfunc.hpp"
 #include <cstdlib>
 #include <cmath>
+#include <cstdio>
 
 double boxMulerNormal(double * n1, double * n2){
     // This helper function will generate two variables following
@@ -11,7 +12,7 @@ double boxMulerNormal(double * n1, double * n2){
     double u2 = 1.0*rand()/RAND_MAX;
 
     // Then, calculate the normal variables
-    double common = -2*sqrt(log(u1));
+    double common = sqrt(-2*log(u1));
     *n1 = common*cos(2*M_PI*u2);
     *n2 = common*sin(2*M_PI*u2);
 
@@ -86,6 +87,6 @@ int LocalityHashFamily::hash(int hash_id, Vector * v){
     // This will perform the hashing of the vector provided
     // hash_id will determine which parameters are used
 
-    return floor(1.0*(vectors[hash_id]->dotProduct(v)+tvalues[hash_id])/w);
+    return (int)floor((vectors[hash_id]->dotProduct(v)+tvalues[hash_id])/w);
 
 }

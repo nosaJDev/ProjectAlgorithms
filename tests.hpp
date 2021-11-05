@@ -6,6 +6,9 @@
 #include "dstructs/list.hpp"
 #include "dstructs/hashtable.hpp"
 #include "dstructs/pqueue.hpp"
+#include "fileparse/vectorfile.hpp"
+#include "dstructs/lsh.hpp"
+#include "geometry/metric.hpp"
 
 void test_list(){
 
@@ -164,3 +167,109 @@ void test_priority_queue(){
     delete myqueue;
 
 }
+
+void test_vector_reading(){
+
+    // Create a vector file parser with the approriate filename
+    VectorFile * myvectors = new VectorFile("./datasets/input_small_id",0);
+
+    // Check and read out the vectors
+    List * vlist = myvectors->getVectorList();
+    for(int i = 0; i < vlist->getElems(); i++){
+        Vector * vec = (Vector *) vlist->get(i);
+        //if(i > 9920) vec->print();
+    }
+
+    // Print the number of vectors you have read
+    printf("I have successfully read %d vectors\n",vlist->getElems());
+
+    // Finally destroy the vectorfile object
+    delete myvectors;
+
+}
+
+void test_lsh(){
+
+    // First read the input vectors and the query vectors
+    printf("Reading the files\n");
+    VectorFile * inputvecs = new VectorFile("./datasets/input_small_id",0);
+    VectorFile * queryvecs = new VectorFile("./datasets/query_small_id",0);
+
+    // Then create the lsh structure
+    // int _L, int _k,int _w, int buckets, int dim
+    printf("Creating the data structure\n");
+    LSH * localityhash = new LSH(16,4,4,27,128);
+
+    //Insert the vectors into the locality hash
+    printf("Inserting the input vectors into the data structure\n");
+    localityhash->addVectorList(inputvecs->getVectorList());
+
+    // Intialize the L2 Metric
+    Metric * metric = new L2Metric();
+
+    // Test the locality hashing first
+    List * inputlist = inputvecs->getVectorList();
+    LocalityHashFamily * lhf = new LocalityHashFamily(200,128,4);
+
+    for(int i = 0; i < inputlist->getElems()/10; i++){
+
+        // Get the vector
+        Vector * vec = (Vector*)inputlist->get(i);
+
+        // Find three values from three hashfunctions
+        int vals[3];
+        vals[0] = lhf->hash(5,vec);
+        vals[1] = lhf->hash(25,vec);
+        vals[2] = lhf->hash(23,vec);
+
+        // Print them out
+        //printf("For vector %s, values %d %d %d\n",vec->getLabel(),vals[0],vals[1],vals[2]);
+
+
+    }
+
+    delete lhf;
+
+
+    // Then extract the query list and perform queries
+    List * qlist = queryvecs->getVectorList();
+    for(int i = 0; i < qlist->getElems(); i++){
+
+        // Get the current vector
+        Vector * vec = (Vector*) qlist->get(i);
+
+        // Find the closest neighbor
+        Vector * nn = localityhash->approximateNN(vec,metric);
+
+        // Print it out
+        double ld;
+        if(nn != nullptr){
+            ld = metric->dist(vec,nn);
+            printf("Found closest neighbor of distance %lf\n",ld);
+        }
+
+        // Calcuate real closest dist
+        double rd = 9999;
+        double t;
+        int missed = 0;
+        for(int j = 0; j < inputlist->getElems(); j++){
+            Vector * oth = (Vector *) inputlist->get(j);
+            t = metric->dist(oth, vec);
+            if(t < rd){
+                rd = t;
+            }
+            if(t < ld)
+                missed++;
+        }
+        printf("Real least distance: %lf, missed %d close vectors\n",rd,missed);
+
+    }
+
+    // Delete any redundant objects
+    delete localityhash;
+    delete inputvecs;
+    delete queryvecs;
+
+
+}
+
