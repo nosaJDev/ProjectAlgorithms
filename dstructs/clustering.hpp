@@ -2,7 +2,6 @@
 #define _cluster
 #include "pointstruct.hpp"
 #include "hashtable.hpp"
-#include "metric.hpp"
 #include "pqueue.hpp"
 
 class LloydClusterer{
@@ -24,6 +23,7 @@ class LloydClusterer{
         List * points; // A list with all the points that need to be clustered
         HashTable * clusters; // A hashtable that contains the clustered points
         PointStruct * query; // The datastructure that allows for range queries
+        bool queryDone; // Indicating if the query object has been initialized
 
 
         // Internal working functions
@@ -39,8 +39,14 @@ class LloydClusterer{
 
         // Con/destructors
         LloydClusterer(int,List * p,int,bool, PointStruct * = nullptr);
+        ~LloydClusterer();
 
+        // Operations
+        void performClustering(Metric *,int = -1);
 
+        // Result getters
+        List * getCluster(int);
+        Vector * getCentroid(int);
 
 
 

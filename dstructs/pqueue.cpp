@@ -68,13 +68,13 @@ void PriorityQueue::add(void * elem, double priority){
     // Elements that do not fit will be deleted.
 
     // First, check if the element is already present on the priority queue
-    if( double_check->exists(elem, (int) elem)){
+    if( double_check->exists(elem, (long long) elem)){
         // If it exists, then don't add it again
         return;
     }
 
     // If it does not exist, mark it as added on the double checker
-    double_check->add(elem, (int) elem);
+    double_check->add(elem, (long long) elem);
 
     // Check if you need to double the space to fit
     if (elems == size)
@@ -183,6 +183,9 @@ void * PriorityQueue::remove(){
 
     // Decrement the element counter
     elems--;
+
+    // Finally return the removed element
+    return ret_elem;
 
 }
 

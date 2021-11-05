@@ -1,7 +1,7 @@
 #include "vector.hpp"
 #include <cstring>
 
-Vector::Vector(int _size, double * values = nullptr, char * _label = nullptr){
+Vector::Vector(int _size, double * values, char * _label){
     // Creates a vector, sets the size and adds initial values
 
     size = _size;
@@ -112,5 +112,19 @@ bool Vector::addPossibleCluster(int clust, double cdist){
     }
 
     return ret;
+
+}
+
+int Vector::getCluster(){
+
+    // Returns the cluster that has been set for the vector
+    return cluster;
+
+}
+
+void Vector::resetCluster(){
+
+    // Resets the placement on the cluster
+    cluster = -1;
 
 }

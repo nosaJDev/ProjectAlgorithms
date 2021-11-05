@@ -241,8 +241,14 @@ PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric
             if(elem->key != master_key)
                 continue;
 
-            // Retrieve the vector and find the distance with the metric
+            // Retrieve the vector
             Vector * v = (Vector *) elem->data;
+
+            // Prevent clustered vectors from participating
+            if ( v->getCluster() == -1)
+                continue;
+
+            // Calculate the distance
             double dist = metric->dist(v,q);
 
             // If the distance is within the radius insert at the priority queue

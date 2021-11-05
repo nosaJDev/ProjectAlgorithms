@@ -5,8 +5,8 @@
 #ifndef _pstruct
 #define _pstruct
 #include "pqueue.hpp"
-#include "vector.hpp"
-#include "metric.hpp"
+#include "../geometry/vector.hpp"
+#include "../geometry/metric.hpp"
 
 class PointStruct{
 
@@ -15,7 +15,7 @@ class PointStruct{
     public:
 
         // Make the destructor virtual to avoid cataclysmic failure
-        virtual ~PointStruct();
+        virtual ~PointStruct(){};
 
         // This is the preprocessing step
         virtual void addVectorList(List *) = 0;

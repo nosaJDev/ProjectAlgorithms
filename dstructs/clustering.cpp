@@ -1,7 +1,7 @@
 #include "clustering.hpp"
 #include <cstdlib>
 
-LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct * q = nullptr){
+LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct * q){
 
     // This will initialize the basic data structures involved in clustering
     
@@ -11,6 +11,7 @@ LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct 
     query = q;
     points = pts;
     dimension = d;
+    queryDone = false;
 
     // Initialize the cluster hash table
     clusters = new HashTable(k);
@@ -20,6 +21,24 @@ LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct 
     for(int i = 0; i < k; i++){
         centroids[i] = new Vector(d);
     }
+
+}
+
+LloydClusterer::~LloydClusterer(){
+
+    // Delete the centroids
+    for(int i = 0; i < k; i++){
+        delete centroids[i];
+    }
+    delete[] centroids;
+
+    // Delete the query object if it exists
+    if(query != nullptr)
+        delete query;
+
+    // Delete the clusters hashtable
+    delete clusters;
+
 
 }
 
@@ -99,8 +118,10 @@ void LloydClusterer::initialization(Metric * metric){
 
     // If you are performing range searches for the assignment, insert the
     // points on the appropriate data structure
-    query->addVectorList(points);
-
+    if( !queryDone){
+        queryDone = false;
+        query->addVectorList(points);
+    }
 
 }
 
@@ -243,6 +264,9 @@ void LloydClusterer::rangeAssignment(Metric * metric){
         // Place it accordingly
         clusters->add((void*)v,cluster);
 
+        // Reset the cluster placement
+        v->resetCluster();
+
     }
 
     // After all that, dispose of the queue array
@@ -309,5 +333,56 @@ bool LloydClusterer::update(){
     // Check if you reached the threshold to stop
     double thres = 5.0;
     return maxd <= thres*thres;
+
+}
+
+void LloydClusterer::performClustering(Metric * metric,int times){
+
+    // This will repeat the circle of clustering as many times
+    // as the user commands. Clustering will stop automatically
+    // because of the terminal conditions even if the cycles have
+    // not yet finished.
+
+    // First initialize the clustering
+    initialization(metric);
+
+    // Then perform the two step loop
+    int i = 0;
+    while(i != times){
+
+        assignment(metric);
+        
+        // Check if you need to stop after the update
+        if ( update()){
+            break;
+        }
+
+        i++;
+    }
+
+}
+
+List * LloydClusterer::getCluster(int c){
+
+    // Returns the list of vectors that belong to a specific cluster
+    
+    // Check that the argument is within bounds
+    if ( c < 0 || c > k)
+        return nullptr;
+
+    return clusters->getChain(c);
+
+}
+
+Vector * LloydClusterer::getCentroid(int c){
+
+    // Returns the vector representing the centroid of the cluster
+    // in question
+
+    // Check that the argumetn is within bounds
+    if (c < 0 || c > k)
+        return nullptr;
+
+    return centroids[c];
 
 }

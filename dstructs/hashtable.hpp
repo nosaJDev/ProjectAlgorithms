@@ -10,9 +10,9 @@ struct HashElement{
     // These structs are created and deleted automatically by the HashTable
 
     void * data;
-    int key;
+    long long key;
 
-    HashElement(void * d, int k){
+    HashElement(void * d, long long k){
         // Add the data to the struct
         data = d;
         key = k;

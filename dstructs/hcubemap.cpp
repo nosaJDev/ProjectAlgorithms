@@ -201,7 +201,7 @@ Vector * HypercubeMapping::approximateNN(Vector * q, Metric * metric){
 
             // Check if you are closer than the sofar NN
             double d = metric->dist(q, (Vector *) he->data);
-            if ( mindist < d ){
+            if ( mindist > d ){
                 // Replace the NN with the better one
                 mindist = d;
                 nn = (Vector *) he->data;
@@ -282,14 +282,19 @@ PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Me
 
             // Find the element
             HashElement * he = (HashElement *) bucket->get(j);
+            Vector * v = (Vector*) he->data;
+
+            // Prevent clustered vectors from participating
+            if ( v->getCluster() != -1)
+                continue;
 
             // Find the distance of the vectors
-            double d = metric->dist(q, (Vector *) he->data);
+            double d = metric->dist(q, v);
 
             // If the distance is within radius, add the element to the
             // priority queue.
             if(d < radius)
-                queue->add((void *) he->data, d);
+                queue->add((void *) v, d);
 
         }
 

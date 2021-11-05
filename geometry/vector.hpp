@@ -39,6 +39,7 @@ class Vector{
         // Operations used in range clustering
         bool addPossibleCluster(int, double);
         int getCluster();
+        void resetCluster();
 
 
 };

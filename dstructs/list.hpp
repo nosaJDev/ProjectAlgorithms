@@ -26,7 +26,7 @@ class ListNode{
         ListNode * getNext();
         void setNext(ListNode *);
 
-}
+};
 
 class List{
 
@@ -64,7 +64,7 @@ class List{
 
 
 
-}
+};
 
 
 #endif

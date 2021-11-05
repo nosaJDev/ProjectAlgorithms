@@ -15,6 +15,8 @@ double boxMulerNormal(double * n1, double * n2){
     *n1 = common*cos(2*M_PI*u2);
     *n2 = common*sin(2*M_PI*u2);
 
+    return *n1;
+
 }
 
 

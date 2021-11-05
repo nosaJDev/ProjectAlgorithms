@@ -1,9 +1,7 @@
 #ifndef _hcubemap
 #define _hcubemap
-#include "../geometry/vector.hpp"
 #include "hashfunc.hpp"
 #include "hashtable.hpp"
-#include "metric.hpp"
 #include "pqueue.hpp"
 #include "pointstruct.hpp"
 
