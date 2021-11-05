@@ -1,15 +1,12 @@
 #include <cstdio>
 #include <cstdlib>
+#include "tests.hpp"
 
 int main(){
 
-    char string[20] = "12 32";
-
-    int a;
-    sscanf(string,"%d",&a);
-    printf("%d\n",a);
-    sscanf(string,"%d",&a);
-    printf("%d\n",a);
+    // test_list();  Passed!
+    //test_hashtable();// Passed?
+    test_priority_queue();
 
     return 0;
 

@@ -47,6 +47,7 @@ class PriorityQueue{
         // Operators
         void add(void*,double);
         void * peek();
+        double peekPriority();
         void * remove();
         QueueElement ** getArray();
 

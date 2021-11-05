@@ -39,7 +39,7 @@ void HashTable::add(void * elem, int key){
 
     // Ignore negative keys
     if(key < 0)
-        return;
+        key = -key;
 
     // Find the actual position
     int pos = key % size;
@@ -81,7 +81,7 @@ List * HashTable::getChain(int key){
 
     // Ignore negative keys
     if(key < 0)
-        return nullptr;
+        key = -key;
     
     // Find the position
     int pos = key % size;
@@ -119,6 +119,9 @@ void HashTable::reset(){
         }
 
     }
+
+    // Reset the elements to zero
+    elems = 0;
 
 
 }

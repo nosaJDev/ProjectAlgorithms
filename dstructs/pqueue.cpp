@@ -1,5 +1,5 @@
 #include "pqueue.hpp"
-
+#include <cstdio>
 
 PriorityQueue::PriorityQueue(int _size){
 
@@ -8,7 +8,7 @@ PriorityQueue::PriorityQueue(int _size){
     elems = 0;
     
     // Size + 2 because it's easier for adding elements
-    array = new QueueElement*[size+2];
+    array = new QueueElement*[size];
 
     // Initiate the hash table for double checking
     double_check = new HashTable(size);
@@ -38,12 +38,12 @@ void PriorityQueue::doubleArray(){
     QueueElement ** newarray = new QueueElement*[newsize];
 
     // Copy the elements to the new array
-    for(int i = 0; i < elems; i++){
+    for(int i = 0; i < elems+1; i++){
         newarray[i] = array[i];
     }
     
     // Set the rest elements to null
-    for(int i = elems; i < newsize; i++){
+    for(int i = elems+1; i < newsize; i++){
         newarray[i] = nullptr;
     }
 
@@ -77,15 +77,16 @@ void PriorityQueue::add(void * elem, double priority){
     double_check->add(elem, (long long) elem);
 
     // Check if you need to double the space to fit
-    if (elems == size)
+    if (elems+1 >= size)
         doubleArray();
 
     // Add the element to the last spot
-    array[elems+1] = new QueueElement(elem,priority);
+    QueueElement * my_elem = new QueueElement(elem,priority);
 
     // Then perform swapping to get it to the correct spot
     int spot_at = elems+1;
-    QueueElement * my_elem = array[elems+1];
+    array[spot_at] = my_elem;
+
     while(spot_at > 1){
 
         // Get the contesting element
@@ -104,17 +105,10 @@ void PriorityQueue::add(void * elem, double priority){
         
     }
 
-    // Check if you pushed an element out
-    if (elems == size){
-        // If you have, delete the QueueElement at the tail
-        delete array[size];
-        array[size] = nullptr;
-    }
-
     // Increment the number of elements
-    if (elems < size)
-        elems++;
+    elems++;
 
+    
 }
 
 void * PriorityQueue::peek(){
@@ -131,6 +125,17 @@ void * PriorityQueue::peek(){
 
 }
 
+double PriorityQueue::peekPriority(){
+
+    // It returns the priority of the first element
+    // retruns zero if no first element
+    
+    if(elems == 0)
+        return 0;
+    
+    return array[1]->priority;
+}
+
 void * PriorityQueue::remove(){
 
     // This will remove and return the first priority queue element
@@ -145,6 +150,13 @@ void * PriorityQueue::remove(){
     // Delete the corresponding QueueElement struct
     delete array[1];
 
+    // Leave early if only one element
+    if(elems == 1){
+        elems = 0;
+        array[1] = nullptr;
+        return ret_elem;
+    }
+
     // Replace with the last element and perform descend
     array[1] = array[elems];
     array[elems] = nullptr;
@@ -152,32 +164,37 @@ void * PriorityQueue::remove(){
     while(true){
 
         int down_spot = -1;
-        if (2*spot_at < size && array[2*spot_at] == nullptr){
-            down_spot = 2*spot_at;
-        }else if (2*spot_at+1 < size && array[2*spot_at+1] == nullptr){
-            down_spot = 2*spot_at+1;
-        }else{
-
-            // Special case for end of queue
-            if (2*spot_at < size){
-                // You are at the bottom, nowhere to go
-                break;
-            }if (2*spot_at+1){
+        if (2*spot_at >= size || array[2*spot_at] == nullptr){
+            // No children
+            // Nowhere to go from here
+            break;
+        }else if (2*spot_at+1 > size || array[2*spot_at+1] == nullptr){
+            // Only left child
+            // Check if you need to decend left
+            if (array[2*spot_at]->priority < array[spot_at]->priority)
                 down_spot = 2*spot_at;
+            else break;
+        }else{
+            // Both children are present
+            // Descend to the largest
+            double pri;
+            if (array[2*spot_at]->priority < array[2*spot_at+1]->priority){
+                down_spot = 2*spot_at;
+                pri = array[2*spot_at]->priority;
             }else{
-                // Descend to the largest
-                if (array[2*spot_at]->priority < array[2*spot_at+1]->priority){
-                    down_spot = 2*spot_at;
-                }else{
-                    down_spot = 2*spot_at+1;
-                }
+                down_spot = 2*spot_at+1;
+                pri = array[2*spot_at+1]->priority;
             }
+            
+            // Check if you are good
+            if(array[spot_at]->priority < pri)
+                break;
         }
 
         // Perform the swap
         QueueElement * temp = array[spot_at];
         array[spot_at] = array[down_spot];
-        QueueElement * other = array[down_spot];
+        array[down_spot] = temp;
         spot_at = down_spot;
     }
 
@@ -193,6 +210,6 @@ QueueElement ** PriorityQueue::getArray(){
 
     // Returns the array with all the QueueElements
     // Read only, do not tamper on the outside
-    return array;
+    return array+1;
 
 }
