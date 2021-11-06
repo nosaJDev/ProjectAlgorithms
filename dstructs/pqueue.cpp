@@ -9,6 +9,9 @@ PriorityQueue::PriorityQueue(int _size){
     
     // Size + 2 because it's easier for adding elements
     array = new QueueElement*[size];
+    for(int i = 0; i < size; i++){
+        array[i] = nullptr;
+    }
 
     // Initiate the hash table for double checking
     double_check = new HashTable(size);
