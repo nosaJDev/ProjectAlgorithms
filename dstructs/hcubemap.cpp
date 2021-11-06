@@ -1,5 +1,6 @@
 #include "hcubemap.hpp"
 #include <cstdlib>
+#include <cstdio>
 
 int f(int func_id, int value){
     // This is an implementation of the family of f functions
@@ -142,7 +143,7 @@ int HypercubeMapping::findVectorCubeKey(Vector * v){
         int i_bit = f(i,i_value);
 
         // Add it to the key and bitswift
-        key = (key << 2)+i_bit;
+        key = (key << 1)+i_bit;
 
     }
 
@@ -268,6 +269,10 @@ PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Me
 
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);
+
+    // Print the qkey to test
+    printf("key = %d\n",qkey);
+    fflush(stdout);
 
     // Then retrieve the list of buckets to check according to hamming distance
     int * bucks = inclusiveHamming(qkey,cubedims, hamming);

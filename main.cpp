@@ -10,13 +10,14 @@ int main(){
 
     // test_list();  Passed!
     // test_hashtable(); Passed thank god
-    // test_priority_queue(); Passed with flying colors
+    // test_priority_queue(); Passed, don't even doubt it
 
     // test_vector_reading(); Successful
     // test_hash_methods(0); (LSH) Works, needs valgrind testing
-    // test_hash_methods(1); // (Hypercube) Pending
+    while(true)
+        test_hash_methods(1,true,false,false); // (Hypercube) Pending
 
-    test_hamming_calculation();
+    // test_hamming_calculation(); Passed, pending valgring check
 
 
     return 0;

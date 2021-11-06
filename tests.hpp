@@ -118,18 +118,18 @@ void test_priority_queue(){
     PriorityQueue * myqueue = new PriorityQueue(5);
 
     // Create some elements to add to the queue
-    int * objects[30];
-    double priorities[30];
-    for(int i = 0; i < 30; i++){
+    int * objects[600];
+    double priorities[600];
+    for(int i = 0; i < 600; i++){
         
-        objects[i] = new int(rand() % 300);
-        priorities[i] = 20.0*rand()/RAND_MAX;
+        objects[i] = new int(rand() % 10000);
+        priorities[i] = 100.0*rand()/RAND_MAX;
 
     }
 
     // Add the objects in the queue
     printf("Adding objects in the queue\n");
-    for(int i = 0; i < 30; i++){
+    for(int i = 0; i < 600; i++){
         printf("Adding %d\n",i);
         fflush(stdout);
         myqueue->add((void*) objects[i],priorities[i]);
@@ -139,7 +139,7 @@ void test_priority_queue(){
     // Display the whole array and the elements and the size
     printf("The queue elements are %d\n",myqueue->getElems());
     QueueElement ** els = myqueue->getArray();
-    for(int i = 0; i < 30; i++){
+    for(int i = 0; i < 600; i++){
         QueueElement * el = els[i];
         printf("%d:%.2lf ", *((int*)el->data),el->priority);
     }
@@ -147,7 +147,7 @@ void test_priority_queue(){
 
     // Try to reinsert old elements and check the size
     printf("Trying to reinsert past elements\n");
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < 20; i++){
         myqueue->add((void*) objects[i],priorities[i]);
     }
     printf("The queue elements are %d, should be same as before\n\n",myqueue->getElems());
@@ -162,7 +162,7 @@ void test_priority_queue(){
     printf("\n");
 
     // Delete the elements and the queue
-    for(int i = 0; i < 30; i++){
+    for(int i = 0; i < 600; i++){
         delete objects[i];
     }
     delete myqueue;
@@ -216,7 +216,7 @@ void test_hamming_calculation(){
 
 }
 
-void test_hash_methods(int mode){
+void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool skip_range = false){
 
     // First read the input vectors and the query vectors
     printf("Reading the files\n");
@@ -245,6 +245,8 @@ void test_hash_methods(int mode){
     List * inputlist = inputvecs->getVectorList();
     LocalityHashFamily * lhf = new LocalityHashFamily(200,128,4);
 
+
+
     for(int i = 0; i < inputlist->getElems()/10; i++){
 
         // Get the vector
@@ -267,6 +269,9 @@ void test_hash_methods(int mode){
 
     // Then extract the query list and perform queries
     List * qlist = queryvecs->getVectorList();
+    if(skip_nn) goto n1;
+
+    
     for(int i = 0; i < qlist->getElems(); i++){
 
         // Get the current vector
@@ -299,6 +304,9 @@ void test_hash_methods(int mode){
 
     }
 
+    n1:
+    if(skip_knn) goto n2;
+
     // Then perform the kNN search for some
     for(int i = 0; i < qlist->getElems()/10; i++){
 
@@ -330,7 +338,11 @@ void test_hash_methods(int mode){
 
     // Finally, perform a range search for some
     
+    n2:
     int a = qlist->getElems()/10;
+    if(skip_range) goto n3;
+
+    
     for(int i = a; i < 2*a; i++){
 
         // Get the vector of the search
@@ -338,11 +350,12 @@ void test_hash_methods(int mode){
 
         // Perform the search and get the priority queue
         double radius = 430.0;
+        fflush(stdout);
         PriorityQueue * result = localityhash->approximateRange(radius,vec,metric);
 
         // Display some of the results
         
-        printf("Range search with r = %lf for %s:\n",radius,vec->getLabel());
+        printf("Range search with r = %lf for %s found %d:\n",radius,vec->getLabel(),result->getElems());
         
         while(result->getElems()>0){
 
@@ -351,12 +364,14 @@ void test_hash_methods(int mode){
 
             // Print the distances
             printf("Found vector with distance %lf\n",metric->dist(nn,vec));
-
+            fflush(stdout);
         }
 
         // Then delete the PriorityQueue
         delete result;
     }
+
+    n3:
     
 
     // Delete any redundant objects
