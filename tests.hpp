@@ -8,6 +8,7 @@
 #include "dstructs/pqueue.hpp"
 #include "fileparse/vectorfile.hpp"
 #include "dstructs/lsh.hpp"
+#include "dstructs/hcubemap.hpp"
 #include "geometry/metric.hpp"
 
 void test_list(){
@@ -188,7 +189,34 @@ void test_vector_reading(){
 
 }
 
-void test_lsh(){
+void test_hamming_calculation(){
+
+    // Test the hamming result of various numbers with 4 bits and distances from 0 to 2
+
+    for(int i = 0; i < 40; i++){
+        
+        // Check the number you will find
+        int number = rand() % 16;
+        int dist = rand() % 3;
+
+        // Run the hamming to obtain the array
+        int * res = inclusiveHamming(number,4,dist,nullptr);
+
+        // Print the result
+        printf("Result for %d with distance %d:[",number,dist);
+        for(int i = 1; i <= res[0]; i++){
+            printf(" %d%s",res[i],(i != res[0])?",":"");
+        }
+        printf("]\n");
+
+        // Delete the array after you viewed it
+        delete[] res;
+
+    }
+
+}
+
+void test_hash_methods(int mode){
 
     // First read the input vectors and the query vectors
     printf("Reading the files\n");
@@ -196,9 +224,15 @@ void test_lsh(){
     VectorFile * queryvecs = new VectorFile("./datasets/query_small_id",0);
 
     // Then create the lsh structure
-    // int _L, int _k,int _w, int buckets, int dim
     printf("Creating the data structure\n");
-    LSH * localityhash = new LSH(16,4,4,27,128);
+    PointStruct * localityhash;
+    if(mode == 0){
+        // int _L, int _k,int _w, int buckets, int dim
+        localityhash = new LSH(20,6,4,27,128);
+    }else{
+        // int cdims, int _w, int dims
+        localityhash = new HypercubeMapping(3,4,128);
+    }
 
     //Insert the vectors into the locality hash
     printf("Inserting the input vectors into the data structure\n");
@@ -264,6 +298,66 @@ void test_lsh(){
         printf("Real least distance: %lf, missed %d close vectors\n",rd,missed);
 
     }
+
+    // Then perform the kNN search for some
+    for(int i = 0; i < qlist->getElems()/10; i++){
+
+        // Get the vector of the search
+        Vector * vec = (Vector*) qlist->get(i);
+
+        // Perform the search and get the priority queue
+        PriorityQueue * result = localityhash->approximatekNN(7,vec, metric);
+
+        // Display some of the results
+        printf("Closest neighbors for %s:\n",vec->getLabel());
+        for(int j = 0; j < 5; j++){
+
+            // Acquire the next vector
+            Vector * nn = (Vector*) result->remove();
+            if(nn == nullptr) break;
+
+            // Print the distances
+            printf("Found vector with distance %lf\n",metric->dist(nn,vec));
+
+        }
+
+        // Then delete the PriorityQueue
+        delete result;
+
+    }
+
+    fflush(stdout);
+
+    // Finally, perform a range search for some
+    
+    int a = qlist->getElems()/10;
+    for(int i = a; i < 2*a; i++){
+
+        // Get the vector of the search
+        Vector * vec = (Vector*) qlist->get(i);
+
+        // Perform the search and get the priority queue
+        double radius = 430.0;
+        PriorityQueue * result = localityhash->approximateRange(radius,vec,metric);
+
+        // Display some of the results
+        
+        printf("Range search with r = %lf for %s:\n",radius,vec->getLabel());
+        
+        while(result->getElems()>0){
+
+            // Acquire the next vector
+            Vector * nn = (Vector*) result->remove();
+
+            // Print the distances
+            printf("Found vector with distance %lf\n",metric->dist(nn,vec));
+
+        }
+
+        // Then delete the PriorityQueue
+        delete result;
+    }
+    
 
     // Delete any redundant objects
     delete localityhash;

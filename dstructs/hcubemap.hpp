@@ -46,4 +46,7 @@ class HypercubeMapping: public PointStruct{
 
 };
 
+// Putting it out there for testing
+int * inclusiveHamming(int, int, int, HashTable * = nullptr);
+
 #endif

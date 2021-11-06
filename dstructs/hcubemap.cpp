@@ -15,7 +15,7 @@ int f(int func_id, int value){
 }
 
 
-int * inclusiveHamming(int number, int bits, int dist, HashTable * ht = nullptr){
+int * inclusiveHamming(int number, int bits, int dist, HashTable * ht){
 
     // This function takes a number, and the number of viable bits,
     // and returns an array of numbers with less than or equal hamming
@@ -34,7 +34,8 @@ int * inclusiveHamming(int number, int bits, int dist, HashTable * ht = nullptr)
     if (dist <= 0){
         // If the distance is zero, only this number applies
         // Insert it to the hash table
-        ht->add(nullptr,number);
+        if(!ht->exists(nullptr,number))
+            ht->add(nullptr,number);
 
     }else{
         // If the distance is more, find all the numbers with distance one,
@@ -48,7 +49,8 @@ int * inclusiveHamming(int number, int bits, int dist, HashTable * ht = nullptr)
             int num = number ^ at;
 
             // Insert it at the hash table
-            ht->add(nullptr,num);
+            if(!ht->exists(nullptr,num))
+                ht->add(nullptr,num);
 
             // Recursively call the function for lower distances
             inclusiveHamming(num,bits,dist-1,ht);
@@ -58,7 +60,9 @@ int * inclusiveHamming(int number, int bits, int dist, HashTable * ht = nullptr)
         }
 
         // Finally add the initial number to the hash table
-        ht->add(nullptr,number);
+        // Add elements only once
+        if(!ht->exists(nullptr,number))
+            ht->add(nullptr,number);
 
     }
 

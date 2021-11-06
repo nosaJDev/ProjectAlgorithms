@@ -19,7 +19,7 @@ PriorityQueue::PriorityQueue(int _size){
 PriorityQueue::~PriorityQueue(){
 
     // Delete all QueueElement structs
-    for(int i = 0; i < elems; i++){
+    for(int i = 1; i <= elems; i++){
         delete array[i];
     }
     delete[] array;

@@ -84,7 +84,7 @@ int LSH::getVectorMasterKey(int level, Vector * v){
     // Finally add the hash values together
     int res = 0;
     for(int i = 0; i < k; i++){
-        res += ((hashfunc->hash(hash_ids[level][i],v)*rands[i])  % M+M)%M;
+        res += ((hashfunc->hash(hash_ids[level][i],v)*rands[i]) % M+M)%M;
     }
     
     // Produce the key and return it
@@ -222,7 +222,7 @@ PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric
     // First create a priority queue to hold the potentials
     // It must be able to hold as many elements as there are
     // This may change to put a limit and save ourselves
-    PriorityQueue * queue = new PriorityQueue(2+elems/8);
+    PriorityQueue * queue = new PriorityQueue(30);
 
     // Then, search the correct bucket for each level
     for(int l = 0; l < L; l++){
@@ -245,7 +245,7 @@ PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric
             Vector * v = (Vector *) elem->data;
 
             // Prevent clustered vectors from participating
-            if ( v->getCluster() == -1)
+            if ( v->getCluster() != -1)
                 continue;
 
             // Calculate the distance
