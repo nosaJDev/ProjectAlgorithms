@@ -9,35 +9,30 @@ using namespace std;
 
 int main(int argc,char** argv){
     
-    if (argc != 15){
-        printf("usage: $./lsh –i inputfile –q queryfile –k int -L int -ο outputfile -Ν numberofnearest -R radius\n");
+    if (argc != 11){
+        
+        printf("$./cluster –i <input file> –c <configuration file> -o <output file> -complete<optional> -m <method: (1)Classic OR (2)LSH or (3)Hypercube>\n");
         exit(1);
     }
     char input_file[1000];
-    char query_file[1000];
-    int k=4;
-    int l=5;
+    char config_file[1000];
+    int complete;
+    int method=1;
     char output_file[1000];
-    int number_of_nearest=1;
-    double radius=10000;
 
 
     //save command line arguements
     for (int i=0; i<argc; i++){
         if (!strcmp(argv[i],"-i")){
             strcpy(input_file,(argv[i+1]));
-        }else if (!strcmp(argv[i],"-q")){
-            strcpy(query_file,(argv[i+1]));
-        }else if (!strcmp(argv[i],"-k")){
-            k = atoi(argv[i+1]);
-        }else if (!strcmp(argv[i],"-L")){
-            l = atoi(argv[i+1]);
+        }else if (!strcmp(argv[i],"-c")){
+            strcpy(config_file,(argv[i+1]));
         }else if (!strcmp(argv[i],"-o")){
             strcpy(output_file,argv[i+1]);
-        }else if (!strcmp(argv[i],"-N")){
-            number_of_nearest = atoi(argv[i+1]);
-        }else if (!strcmp(argv[i],"-R")){
-            radius = atof(argv[i+1]);
+        }else if (!strcmp(argv[i],"-m")){
+            method = atoi(argv[i+1]);
+        }else if (!strcmp(argv[i],"-complete")){
+            complete = atoi(argv[i+1]);
         }
     }
 

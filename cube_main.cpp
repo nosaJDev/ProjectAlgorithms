@@ -9,17 +9,18 @@ using namespace std;
 
 int main(int argc,char** argv){
     
-    if (argc != 15){
-        printf("usage: $./lsh –i inputfile –q queryfile –k int -L int -ο outputfile -Ν numberofnearest -R radius\n");
+    if (argc != 17){
+        printf("./cube –i <input file> –q <query file> –k <int> -M <int> -probes <int> -ο <output file> -Ν <number of nearest> -R <radius>\n");
         exit(1);
     }
     char input_file[1000];
     char query_file[1000];
-    int k=4;
-    int l=5;
+    int k=14;
+    int m=10;
+    int probes=2;
     char output_file[1000];
     int number_of_nearest=1;
-    double radius=10000;
+    double radius=  10000;
 
 
     //save command line arguements
@@ -30,8 +31,10 @@ int main(int argc,char** argv){
             strcpy(query_file,(argv[i+1]));
         }else if (!strcmp(argv[i],"-k")){
             k = atoi(argv[i+1]);
-        }else if (!strcmp(argv[i],"-L")){
-            l = atoi(argv[i+1]);
+        }else if (!strcmp(argv[i],"-M")){
+            m = atoi(argv[i+1]);
+        }else if (!strcmp(argv[i],"-probes")){
+            probes = atoi(argv[i+1]);
         }else if (!strcmp(argv[i],"-o")){
             strcpy(output_file,argv[i+1]);
         }else if (!strcmp(argv[i],"-N")){
