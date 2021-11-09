@@ -375,6 +375,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
     
 
     // Delete any redundant objects
+    delete metric;
     delete localityhash;
     delete inputvecs;
     delete queryvecs;

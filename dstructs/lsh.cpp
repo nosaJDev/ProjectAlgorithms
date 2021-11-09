@@ -86,7 +86,10 @@ int LSH::getVectorMasterKey(int level, Vector * v){
     for(int i = 0; i < k; i++){
         res += ((hashfunc->hash(hash_ids[level][i],v)*rands[i]) % M+M)%M;
     }
-    
+
+    // Delete the randoms before you go
+    delete[] rands;
+
     // Produce the key and return it
     return (res % M + M) % M;
 

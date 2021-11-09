@@ -215,6 +215,9 @@ Vector * HypercubeMapping::approximateNN(Vector * q, Metric * metric){
 
     }
 
+    // Delete the found buckets array
+    delete[] bucks;
+
     // After you are done, return the nearest neighbor
     return nn;
 
@@ -255,6 +258,9 @@ PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric *
         }
 
     }
+
+    // Delete the found buckets array
+    delete[] bucks;
 
     // After you are done, return the priority queue with the elements
     return queue;
@@ -308,6 +314,9 @@ PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Me
         }
 
     }
+
+    // Delete the found buckets array
+    delete[] bucks;
 
     // After you are done, return the priority queue with the elements
     return queue;

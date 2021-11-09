@@ -13,9 +13,8 @@ int main(){
     // test_priority_queue(); Passed, don't even doubt it
 
     // test_vector_reading(); Successful
-    // test_hash_methods(0); (LSH) Works, needs valgrind testing
-    while(true)
-        test_hash_methods(1,true,false,false); // (Hypercube) Pending
+    // test_hash_methods(0); // (LSH) Works flawlessly!
+    test_hash_methods(1); // (Hypercube) Works, pending valgrind
 
     // test_hamming_calculation(); Passed, pending valgring check
 
