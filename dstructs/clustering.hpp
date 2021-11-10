@@ -25,6 +25,8 @@ class LloydClusterer{
         PointStruct * query; // The datastructure that allows for range queries
         bool queryDone; // Indicating if the query object has been initialized
 
+        // Sillouette variables
+        double * sillouete;
 
         // Internal working functions
         void initialization(Metric *);
@@ -42,12 +44,16 @@ class LloydClusterer{
         ~LloydClusterer();
 
         // Operations
-        void performClustering(Metric *,int = -1);
+        int performClustering(Metric *,int = -1);
 
         // Result getters
         List * getCluster(int);
         Vector * getCentroid(int);
 
+        // Sillouete calculation
+        void calculateSillouete(Metric *);
+        double getSillouete(int);
+        double getGlobalSillouete();
 
 
 

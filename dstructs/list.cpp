@@ -46,19 +46,17 @@ void ListNode::setNext(ListNode * _next){
 
 List::List(){
     // Constructs an empty list
-    head = nullptr;
+    size = 50;
+    array = new void*[size];
     elems = 0;
 
-    // Reset the iterator
-    iter_at = -1;
-    iter_node = nullptr;
 
 }
 
 List::~List(){
 
-    // Resets the list before deletion
-    reset();
+    // Delete the array
+    delete[] array;
 
 }
 
@@ -66,17 +64,23 @@ void List::add(void * elem){
 
     // Adds a new element to front of the list
     
-    // Create the new node and set it as the new head
-    head = new ListNode(head, elem);
+    // Double size if necessary
+    if(elems == size){
+        void ** newarray = new void*[size*2];
+        for(int i = 0; i < size; i++)
+            newarray[i] = array[i];
+        size = 2*size;
+        delete[] array;
+        array = newarray;
+
+    }
+
+    // Add to the end of the list
+    array[elems] = elem;
 
     // Increase the element counter
     elems++;
 
-    // Move the iteration forward since you moved the head
-    // one position to the right
-    if(iter_at != -1){
-        iter_at++;
-    }
 
 }
 
@@ -86,51 +90,19 @@ void * List::get(int pos){
     // If out of range it returns nullptr
 
     // Check for negatives
-    if(pos < 0){
+    if(pos < 0 || pos >= elems){
         return nullptr;
     }
 
-    // Check if the iterator must be reset
-    if(iter_at < 0 || iter_at > pos){
-        // Reset the iterator to look at the head
-        iter_at = 0;
-        iter_node = head;
-    }
-
-    // Move the iterator until you reach the node you want
-    for(;iter_node != nullptr && iter_at != pos; iter_at++,iter_node = iter_node->getNext()){}
-
-    // Return the result of the iterator
-    return iter_node->getData();
+    // Return the element
+    return array[pos];
 
 
 }
 
 void List::reset(){
     
-    // This will empty the list of nodes but leave the rest intact for further use
-    
-    // Deletes all the list nodes iteratively
-    for(ListNode * at = head; at != nullptr;){
-
-        // Get the node you are about to delete
-        ListNode * todelete = at;
-
-        // Seek the next node before the detatchment
-        at = at->getNext();
-
-        // Detatch and delete the node
-        todelete->setNext(nullptr);
-        delete todelete;
-
-    }
-
-    // Set the head and iterator appropriately
-    head = nullptr;
-    iter_at = -1;
-    iter_node = nullptr;
-
-    // Reset the size back to zero
+    // This will reset the size, essentially emptying the list
     elems = 0;
 
     

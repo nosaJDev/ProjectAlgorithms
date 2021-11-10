@@ -1,5 +1,6 @@
 #include "clustering.hpp"
 #include <cstdlib>
+#include <cstdio>
 
 LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct * q){
 
@@ -22,6 +23,9 @@ LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct 
         centroids[i] = new Vector(d);
     }
 
+    // Initialize the sillouete array
+    sillouete = new double[k];
+
 }
 
 LloydClusterer::~LloydClusterer(){
@@ -38,6 +42,9 @@ LloydClusterer::~LloydClusterer(){
 
     // Delete the clusters hashtable
     delete clusters;
+
+    // Delete the silouetes
+    delete[] sillouete;
 
 
 }
@@ -71,7 +78,7 @@ void LloydClusterer::initialization(Metric * metric){
         centroids[t++]->paste(pts[pick]);
         Vector * temp = pts[pick];
         pts[pick] = pts[els-t];
-        pts[els-t] = pts[pick];
+        pts[els-t] = temp;
 
         // Stop if you reached your wanted centroids
         if (t >= k) break;
@@ -87,8 +94,8 @@ void LloydClusterer::initialization(Metric * metric){
             for(int j = 1; j < t; j++){
                 // Check if there is a closer one
                 d = metric->dist(centroids[j],pts[i]);
-                if(d < dists[i])
-                    dists[i] = d;
+                if(d*d < dists[i])
+                    dists[i] = d*d;
             }
 
             // Add to the distance sum
@@ -118,7 +125,7 @@ void LloydClusterer::initialization(Metric * metric){
 
     // If you are performing range searches for the assignment, insert the
     // points on the appropriate data structure
-    if( !queryDone){
+    if( !queryDone && rangeAssign){
         queryDone = false;
         query->addVectorList(points);
     }
@@ -170,6 +177,7 @@ void LloydClusterer::directAssignment(Metric * metric){
 
         // Finally, place the object on the cluster you found
         clusters->add((void*)p, mincluster);
+        p->addPossibleCluster(mincluster,mindist);
 
     }
 
@@ -259,13 +267,13 @@ void LloydClusterer::rangeAssignment(Metric * metric){
                     cluster = j;
                 }
             }
+
+            v->addPossibleCluster(cluster,mindist);
         }
 
         // Place it accordingly
         clusters->add((void*)v,cluster);
 
-        // Reset the cluster placement
-        v->resetCluster();
 
     }
 
@@ -298,7 +306,7 @@ bool LloydClusterer::update(){
         for(int j = 0; j < pno; j++){
             
             // Get the point
-            Vector * p = (Vector *) clusterp->get(j);
+            Vector * p = (Vector *) ((HashElement*)clusterp->get(j))->data;
 
             // Add its coordinates to the sum
             for(int cc = 0; cc < dimension; cc++){
@@ -325,18 +333,21 @@ bool LloydClusterer::update(){
         }
 
         // Keep the maximum movement distance
-        if (maxd < 0 || maxd > movedist )
+        if (maxd < movedist )
             maxd = movedist;
 
     }
 
+    // Delete the coord array
+    delete[] coordsum;
+
     // Check if you reached the threshold to stop
     double thres = 5.0;
-    return maxd <= thres*thres;
+    return maxd <= thres*thres && false;
 
 }
 
-void LloydClusterer::performClustering(Metric * metric,int times){
+int LloydClusterer::performClustering(Metric * metric,int times){
 
     // This will repeat the circle of clustering as many times
     // as the user commands. Clustering will stop automatically
@@ -350,6 +361,12 @@ void LloydClusterer::performClustering(Metric * metric,int times){
     int i = 0;
     while(i != times){
 
+        // Reset the clusters on each vector first
+        for(int j = 0; j < points->getElems();j++){
+            Vector * p = (Vector*) points->get(j);
+            p->resetCluster();
+        }
+
         assignment(metric);
         
         // Check if you need to stop after the update
@@ -359,6 +376,8 @@ void LloydClusterer::performClustering(Metric * metric,int times){
 
         i++;
     }
+
+    return i;
 
 }
 
@@ -384,5 +403,126 @@ Vector * LloydClusterer::getCentroid(int c){
         return nullptr;
 
     return centroids[c];
+
+}
+
+void LloydClusterer::calculateSillouete(Metric * metric){
+
+    // Calculate for each vector and for each cluster
+
+    // Initialize the temporary values
+    int els = points->getElems();
+    double a;
+    double b;
+    double s;
+
+    // Reset the sillouete values
+    for(int i = 0; i < k; i++)
+        sillouete[i] = 0;
+
+    int dots = 40;
+    int dot_per = els/dots;
+    int ddots = 0;
+
+
+    // Perform for each vector
+    for(int i = 0; i < els; i++){
+
+        // Get the vector
+        Vector * p = (Vector*) points->get(i);
+
+        // Find its two closest clusters
+        int first = p->getCluster(), second = -1;
+        List * temp;
+        double secondd = 0;
+        for(int j = 0; j < k; j++){
+            
+            // Skip your cluster
+            if(j == first) continue;
+            
+            // find the centroid distance
+            double d = metric->dist(p,centroids[j]);
+
+            // Replace accordingly
+            if(second == -1 || secondd > d){
+                second = j;
+                secondd = d;
+            }
+
+        }
+
+        // Fetch the clusters
+        List * firstc = clusters->getChain(first), * secondc = clusters->getChain(second);
+
+        // Find average distances
+        a = 0;
+        b = 0;
+        for(int j = 0; j < firstc->getElems(); j++){
+            // Find each other vector
+            Vector* v = (Vector*)((HashElement*)firstc->get(j))->data;
+            a += metric->dist(v,p);
+        }
+        //printf("a = %.2lf\n",a);
+        a /= firstc->getElems();
+        //printf("aa = %.2lf\n",a);
+
+        for(int j = 0; j < secondc->getElems(); j++){
+            // Find each other vector
+            Vector* v = (Vector*)((HashElement*)secondc->get(j))->data;
+            b += metric->dist(v,p);
+        }
+        //printf("b = %.2lf\n",b);
+        b /= secondc->getElems();
+        //printf("bb = %.2lf\n",b);
+
+        // Calculate the s of the point
+        s = (b-a)/((a>b)?a:b);
+        //printf("s = %.2lf\n",s);
+
+        // Add that to the silouete of the appropriate cluster
+        sillouete[p->getCluster()] += s;
+
+
+        if((i+1)/dot_per > ddots){
+            ddots = (i+1)/dot_per;
+            printf("\r[");
+            for(int j = 0; j < dots; j++){
+                if(j < ddots)
+                    putchar('.');
+                else
+                    putchar(' ');
+            }
+            printf("] %d/%d",i+1,els);
+            fflush(stdout);
+        }
+
+    }
+    printf("\n");
+
+    // At the end divide to get the correct results
+    for(int i = 0; i < k; i++)
+        sillouete[i] /= clusters->getChain(i)->getElems();
+
+
+}
+
+double LloydClusterer::getSillouete(int c){
+
+    // This will return the sillouete of the specified cluster
+    // You should calculate those first
+    return sillouete[c];
+
+}
+
+double LloydClusterer::getGlobalSillouete(){
+
+    // This will return the average sillouete for all the clusters
+    double s_ret = 0;
+    for(int i = 0; i < k; i++){
+        s_ret += sillouete[i]*clusters->getChain(i)->getElems();
+    }
+    s_ret /= points->getElems();
+    return s_ret;
+
 
 }

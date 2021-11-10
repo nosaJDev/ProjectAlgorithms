@@ -32,20 +32,17 @@ class List{
 
     // This is a generic list that accepts void * data
     // No option for deleting elements
-    // Using the ListNode class above
-    // Built-in iterator for fast in order reading
+    // ListNode proved poor decision, switching to array
 
     private:
 
-        // The head node of the list
-        ListNode * head;
+        // The data of the list
+        void ** array;
+        int size;
 
         // How many elements are in the list
         int elems;
 
-        // Iterator variables
-        int iter_at;
-        ListNode * iter_node;
 
 
     public:

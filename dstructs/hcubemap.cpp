@@ -276,10 +276,6 @@ PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Me
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);
 
-    // Print the qkey to test
-    printf("key = %d\n",qkey);
-    fflush(stdout);
-
     // Then retrieve the list of buckets to check according to hamming distance
     int * bucks = inclusiveHamming(qkey,cubedims, hamming);
 

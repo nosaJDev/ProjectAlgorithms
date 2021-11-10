@@ -41,6 +41,9 @@ VectorFile::VectorFile(const char * filename, int dimension){
     char name_buffer[100]; // Buffer for the label
     double * coord_buffer = new double[dimension];
 
+    // Id variable
+    int id_at = 0;
+
     while(true){
 
         // Check if you are reading the name
@@ -65,7 +68,7 @@ VectorFile::VectorFile(const char * filename, int dimension){
 
 
             // Create and save the vector object aswell
-            Vector * newvec = new Vector(dimension,coord_buffer,name_buffer);
+            Vector * newvec = new Vector(dimension,coord_buffer,name_buffer,id_at++);
             vector_list->add((void*)newvec);
 
 

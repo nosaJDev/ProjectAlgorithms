@@ -13,10 +13,15 @@ int main(){
     // test_priority_queue(); Passed, don't even doubt it
 
     // test_vector_reading(); Successful
-    // test_hash_methods(0); // (LSH) Works flawlessly!
-    test_hash_methods(1); // (Hypercube) Works, pending valgrind
+     test_hash_methods(0,false,true,true); // (LSH) Works flawlessly!
+    // test_hash_methods(1); // (Hypercube) Works as well!
 
-    // test_hamming_calculation(); Passed, pending valgring check
+    // test_hamming_calculation(); Passed
+
+    // test_clustering(0); Passed no problem
+    // test_clustering(1); Passed no leaks
+    // test_clustering(0);
+
 
 
     return 0;

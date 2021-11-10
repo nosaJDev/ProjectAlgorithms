@@ -9,6 +9,10 @@ class Vector{
 
     private:
 
+        // Identification for caching distances
+        // This may increase the speed by much
+        int id = -1;
+
         // Coordinates and dimensions
         double * coords;
         int size;
@@ -21,7 +25,7 @@ class Vector{
     public:
 
         // Con/destructor
-        Vector(int, double * = nullptr, char * = nullptr);
+        Vector(int, double * = nullptr, char * = nullptr,int = -1);
         ~Vector();
 
         // Getters and setters
@@ -39,7 +43,11 @@ class Vector{
         // Operations used in range clustering
         bool addPossibleCluster(int, double);
         int getCluster();
+        double getClusterDist();
         void resetCluster();
+
+        // Identification getters
+        int getId();
 
         // Used for debugging
         void print();

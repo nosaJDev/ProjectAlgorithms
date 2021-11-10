@@ -2,10 +2,11 @@
 #include <cstring>
 #include <cstdio>
 
-Vector::Vector(int _size, double * values, char * _label){
+Vector::Vector(int _size, double * values, char * _label,int _id){
     // Creates a vector, sets the size and adds initial values
 
     size = _size;
+    id = _id;
 
     // Initialize the coordinate array
     coords = new double[size];
@@ -123,10 +124,23 @@ int Vector::getCluster(){
 
 }
 
+double Vector::getClusterDist(){
+    // Returns the distance to the cluster centroid
+    return clusterdist;
+
+}
+
 void Vector::resetCluster(){
 
     // Resets the placement on the cluster
     cluster = -1;
+
+}
+
+int Vector::getId(){
+
+    // Returns the id of the vector
+    return id;
 
 }
 

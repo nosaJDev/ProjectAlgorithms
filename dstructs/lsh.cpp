@@ -71,27 +71,25 @@ int LSH::getVectorMasterKey(int level, Vector * v){
 
     // This will generate the final key for the vector on the specified level
 
-    // First generate random numbers using the offset and the level
-    srand(rand_offset+level);
-    int * rands = new int[k];
-    for(int i = 0; i < k; i++){
-        rands[i] = -1+rand()%3;
-    }
+    // Combine using a mask
+    /*int res = 0;
+    int bitsper = 16/k;
+    int bitmask = 0;
+    for(int i = 0; i < bitsper; i++) bitmask |= 1 << i;*/
 
-    // Then calculate the M value (nineth fibonacci prime)
-    int M = 514229;
-
-    // Finally add the hash values together
     int res = 0;
     for(int i = 0; i < k; i++){
-        res += ((hashfunc->hash(hash_ids[level][i],v)*rands[i]) % M+M)%M;
+        int hr =hashfunc->hash(hash_ids[level][i],v);
+        res += hr;
+        //if(hr < 0) hr = -hr;
+        //res = res | (hashfunc->hash(hash_ids[level][i],v) & bitmask);
+        //res = res << bitsper;
     }
 
-    // Delete the randoms before you go
-    delete[] rands;
+    //printf("res: %d\n",res);
 
     // Produce the key and return it
-    return (res % M + M) % M;
+    return res;
 
 
 }

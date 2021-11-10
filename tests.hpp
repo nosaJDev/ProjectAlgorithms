@@ -10,6 +10,7 @@
 #include "dstructs/lsh.hpp"
 #include "dstructs/hcubemap.hpp"
 #include "geometry/metric.hpp"
+#include "dstructs/clustering.hpp"
 
 void test_list(){
 
@@ -228,7 +229,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
     PointStruct * localityhash;
     if(mode == 0){
         // int _L, int _k,int _w, int buckets, int dim
-        localityhash = new LSH(20,6,4,27,128);
+        localityhash = new LSH(10,8,5,1997,128);
     }else{
         // int cdims, int _w, int dims
         localityhash = new HypercubeMapping(3,4,128);
@@ -239,7 +240,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
     localityhash->addVectorList(inputvecs->getVectorList());
 
     // Intialize the L2 Metric
-    Metric * metric = new L2Metric();
+    Metric * metric = new L2Metric(10000);
 
     // Test the locality hashing first
     List * inputlist = inputvecs->getVectorList();
@@ -269,6 +270,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
 
     // Then extract the query list and perform queries
     List * qlist = queryvecs->getVectorList();
+    int missed_sofar = 0;
     if(skip_nn) goto n1;
 
     
@@ -301,6 +303,8 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
                 missed++;
         }
         printf("Real least distance: %lf, missed %d close vectors\n",rd,missed);
+        missed_sofar += missed;
+        //printf("Missed sofar %d\n",missed_sofar);
 
     }
 
@@ -383,3 +387,61 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
 
 }
 
+void test_clustering(int mode){
+
+    // Read the input vectors
+    printf("Reading input..\n");
+    VectorFile * inputvecs = new VectorFile("./datasets/input_small_id",0);
+    List * inputlist = inputvecs->getVectorList();
+
+    
+
+    // Create the clusterer using the appropriate way
+    //int d, List * pts, int _k,bool range,PointStruct * q
+    int c_no = 3;
+    LloydClusterer * clusterer;
+    PointStruct * hasher = nullptr;
+    if(mode == 0)
+        clusterer = new LloydClusterer(128,inputlist,c_no,false);
+    else if(mode == 1){
+        // int _L, int _k,int _w, int buckets, int dim
+        PointStruct * hasher = new LSH(20,6,4,27,128);
+        clusterer = new LloydClusterer(128,inputlist,c_no,true,hasher);
+    }else{
+        //int cdims, int _w, int dims
+        PointStruct * hasher = new HypercubeMapping(3,4,128);
+        clusterer = new LloydClusterer(128,inputlist,c_no,true,hasher);
+    }
+    // Initialize and check the centroids
+    Metric * metric = new L2Metric(10000);
+
+
+
+    // Do the clustering
+    printf("Performing clustering\n");
+    int res = clusterer->performClustering(metric,20);
+    printf("Stopped after %d passes\n",res);
+
+    printf("Calcualating the sillouetes\n");
+    clusterer->calculateSillouete(metric);
+    
+
+    printf("Printing the cluster sillouetes:\n");
+    for(int i = 0; i < c_no; i++){
+        printf("Sillouete for cluster %d: %lf\n",i,clusterer->getSillouete(i));
+    }
+    printf("Sillouete for all clusters: %lf\n",clusterer->getGlobalSillouete());
+
+
+    // Get the size of the first vector
+    //for(int i = 0 ; i < inputlist->getElems();  i++)
+    //printf("Random size %d\n",((Vector*)inputlist->get(i))->getSize());
+
+    // Delete the clusterer the metric and the vectorfile
+    delete clusterer;
+    delete metric;
+    delete inputvecs;
+    if(hasher != nullptr)
+        delete hasher;
+
+}
