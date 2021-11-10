@@ -2,14 +2,14 @@
 #include <cstring>
 #include <cstdio>
 
-Vector::Vector(int _size, double * values, char * _label,int _id){
+Vector::Vector(int _size, float * values, char * _label,int _id){
     // Creates a vector, sets the size and adds initial values
 
     size = _size;
     id = _id;
 
     // Initialize the coordinate array
-    coords = new double[size];
+    coords = new float[size];
     for(int i = 0; i < size; i++){
         // If the values is defined, use those, else zeros
         if(values != nullptr){
@@ -48,7 +48,7 @@ int Vector::getSize(){
     return size;
 }
 
-double Vector::getCoord(int pos){
+float Vector::getCoord(int pos){
     // Returns the coordinate number at position
     
     // If out of bounds it returns zero
@@ -61,7 +61,7 @@ double Vector::getCoord(int pos){
 
 }
 
-void Vector::setCoord(int pos, double value){
+void Vector::setCoord(int pos, float value){
     // Sets a specific coord of the vector
     
     // If out of bounds, do nothing
@@ -80,11 +80,11 @@ char * Vector::getLabel(){
     return label;
 }
 
-double Vector::dotProduct(Vector * other){
+float Vector::dotProduct(Vector * other){
     // Calculates and returns the dot product of this vector
     // with another one. Assumes that the sizes match
 
-    double res = 0.0;
+    float res = 0.0;
     for(int i = 0; i < size; i++){
         res += coords[i]*other->coords[i];
     }
@@ -101,7 +101,7 @@ void Vector::paste(Vector * other){
 
 }
 
-bool Vector::addPossibleCluster(int clust, double cdist){
+bool Vector::addPossibleCluster(int clust, float cdist){
 
     // Adds a possible cluster based on distance
     // Returns wether this was a first assignment
@@ -124,7 +124,7 @@ int Vector::getCluster(){
 
 }
 
-double Vector::getClusterDist(){
+float Vector::getClusterDist(){
     // Returns the distance to the cluster centroid
     return clusterdist;
 
@@ -158,5 +158,16 @@ void Vector::print(){
         printf(" %.1lf%s",coords[i],(i == size-1)?"":",");
     }
     printf(")\n");
+
+}
+
+void Vector::printFile(FILE * thefile){
+
+    // Similar to print but in a file
+    fprintf(thefile,"(");
+    for(int i = 0; i < size; i++){
+        fprintf(thefile," %.1lf%s",coords[i],(i == size-1)?"":",");
+    }
+    fprintf(thefile,")\n");
 
 }

@@ -31,11 +31,11 @@ class LSH: public PointStruct{
         int ** hash_ids;
 
         // Internal functions for handling vectors
-        int getVectorMasterKey(int, Vector *);
+        long long getVectorMasterKey(int, Vector *);
         void placeVectorToBucket(int, Vector *);
 
-        // A random offset for controlled random values
-        int rand_offset;
+        // the randoms
+        int * rands;
 
         // Bookkeeping for inserted vectors
         int elems;
@@ -51,8 +51,8 @@ class LSH: public PointStruct{
 
         // These are methods for performing queries
         Vector * approximateNN(Vector *,Metric *);
-        PriorityQueue * approximatekNN(int, Vector *, Metric *);
-        PriorityQueue * approximateRange(double, Vector *, Metric *);
+        PriorityQueue * approximatekNN(Vector *, Metric *);
+        PriorityQueue * approximateRange(float, Vector *, Metric *);
 
 
 };

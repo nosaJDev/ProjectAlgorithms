@@ -6,9 +6,9 @@ struct QueueElement{
 
     // This struct holds a priority queue element together with its priority
     void * data;
-    double priority;
+    float priority;
 
-    QueueElement(void * _d, double p){
+    QueueElement(void * _d, float p){
         data = _d;
         priority = p;
     }
@@ -29,11 +29,11 @@ class PriorityQueue{
         
         QueueElement ** array; // The array that holds all the elements
 
-        // The hash table for double checking
-        HashTable * double_check;
+        // The hash table for float checking
+        HashTable * float_check;
 
         // Internal function for growing the array if more space is needed
-        void doubleArray();
+        void floatArray();
 
     public:
 
@@ -45,9 +45,9 @@ class PriorityQueue{
         int getElems();
 
         // Operators
-        void add(void*,double);
+        void add(void*,float);
         void * peek();
-        double peekPriority();
+        float peekPriority();
         void * remove();
         QueueElement ** getArray();
 

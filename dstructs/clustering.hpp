@@ -26,7 +26,7 @@ class LloydClusterer{
         bool queryDone; // Indicating if the query object has been initialized
 
         // Sillouette variables
-        double * sillouete;
+        float * sillouete;
 
         // Internal working functions
         void initialization(Metric *);
@@ -52,8 +52,8 @@ class LloydClusterer{
 
         // Sillouete calculation
         void calculateSillouete(Metric *);
-        double getSillouete(int);
-        double getGlobalSillouete();
+        float getSillouete(int);
+        float getGlobalSillouete();
 
 
 

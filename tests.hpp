@@ -59,7 +59,7 @@ void print_hashtable(HashTable * mytable){
         printf("\n[%d] -> ",i);
         for(int j = 0; j < chain->getElems(); j++){
             HashElement * he = (HashElement *) chain->get(j);
-            printf("%d:%d ",he->key,*((int*)he->data));
+            printf("%lld:%d ",he->key,*((int*)he->data));
         }
         
     }
@@ -120,7 +120,7 @@ void test_priority_queue(){
 
     // Create some elements to add to the queue
     int * objects[600];
-    double priorities[600];
+    float priorities[600];
     for(int i = 0; i < 600; i++){
         
         objects[i] = new int(rand() % 10000);
@@ -156,9 +156,9 @@ void test_priority_queue(){
     // Remove the elements one by one, should come out sorted
     printf("Removing elements in a sorted manner\n");
     while(myqueue->getElems() > 0){
-        double pri = myqueue->peekPriority();
+        float pri = myqueue->peekPriority();
         int a = *((int*)myqueue->remove());
-        printf("%.2lf ", pri, a);
+        printf("%f ", pri);
     }
     printf("\n");
 
@@ -173,7 +173,7 @@ void test_priority_queue(){
 void test_vector_reading(){
 
     // Create a vector file parser with the approriate filename
-    VectorFile * myvectors = new VectorFile("./datasets/input_small_id",0);
+    VectorFile * myvectors = new VectorFile("./datasets/input_small_id");
 
     // Check and read out the vectors
     List * vlist = myvectors->getVectorList();
@@ -221,18 +221,18 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
 
     // First read the input vectors and the query vectors
     printf("Reading the files\n");
-    VectorFile * inputvecs = new VectorFile("./datasets/input_small_id",0);
-    VectorFile * queryvecs = new VectorFile("./datasets/query_small_id",0);
+    VectorFile * inputvecs = new VectorFile("./datasets/input_small_id");
+    VectorFile * queryvecs = new VectorFile("./datasets/query_small_id");
 
     // Then create the lsh structure
     printf("Creating the data structure\n");
     PointStruct * localityhash;
     if(mode == 0){
         // int _L, int _k,int _w, int buckets, int dim
-        localityhash = new LSH(10,8,5,1997,128);
+        localityhash = new LSH(30,2,6,27,128);
     }else{
         // int cdims, int _w, int dims
-        localityhash = new HypercubeMapping(3,4,128);
+        localityhash = new HypercubeMapping(3,4,128,3,3);
     }
 
     //Insert the vectors into the locality hash
@@ -240,11 +240,11 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
     localityhash->addVectorList(inputvecs->getVectorList());
 
     // Intialize the L2 Metric
-    Metric * metric = new L2Metric(10000);
+    Metric * metric = new L2Metric();
 
     // Test the locality hashing first
     List * inputlist = inputvecs->getVectorList();
-    LocalityHashFamily * lhf = new LocalityHashFamily(200,128,4);
+    LocalityHashFamily * lhf = new LocalityHashFamily(500,128,4);
 
 
 
@@ -283,15 +283,15 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
         Vector * nn = localityhash->approximateNN(vec,metric);
 
         // Print it out
-        double ld;
+        float ld;
         if(nn != nullptr){
             ld = metric->dist(vec,nn);
-            printf("Found closest neighbor of distance %lf\n",ld);
+            printf("Found closest neighbor of distance %f\n",ld);
         }
 
         // Calcuate real closest dist
-        double rd = 9999;
-        double t;
+        float rd = 9999;
+        float t;
         int missed = 0;
         for(int j = 0; j < inputlist->getElems(); j++){
             Vector * oth = (Vector *) inputlist->get(j);
@@ -302,7 +302,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
             if(t < ld)
                 missed++;
         }
-        printf("Real least distance: %lf, missed %d close vectors\n",rd,missed);
+        printf("Real least distance: %f, missed %d close vectors\n",rd,missed);
         missed_sofar += missed;
         //printf("Missed sofar %d\n",missed_sofar);
 
@@ -318,7 +318,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
         Vector * vec = (Vector*) qlist->get(i);
 
         // Perform the search and get the priority queue
-        PriorityQueue * result = localityhash->approximatekNN(7,vec, metric);
+        PriorityQueue * result = localityhash->approximatekNN(vec, metric);
 
         // Display some of the results
         printf("Closest neighbors for %s:\n",vec->getLabel());
@@ -353,7 +353,7 @@ void test_hash_methods(int mode,bool skip_nn=false,bool skip_knn = false, bool s
         Vector * vec = (Vector*) qlist->get(i);
 
         // Perform the search and get the priority queue
-        double radius = 430.0;
+        float radius = 430.0;
         fflush(stdout);
         PriorityQueue * result = localityhash->approximateRange(radius,vec,metric);
 
@@ -391,7 +391,7 @@ void test_clustering(int mode){
 
     // Read the input vectors
     printf("Reading input..\n");
-    VectorFile * inputvecs = new VectorFile("./datasets/input_small_id",0);
+    VectorFile * inputvecs = new VectorFile("./datasets/input_small_id");
     List * inputlist = inputvecs->getVectorList();
 
     
@@ -409,11 +409,11 @@ void test_clustering(int mode){
         clusterer = new LloydClusterer(128,inputlist,c_no,true,hasher);
     }else{
         //int cdims, int _w, int dims
-        PointStruct * hasher = new HypercubeMapping(3,4,128);
+        PointStruct * hasher = new HypercubeMapping(3,4,128,3,3);
         clusterer = new LloydClusterer(128,inputlist,c_no,true,hasher);
     }
     // Initialize and check the centroids
-    Metric * metric = new L2Metric(10000);
+    Metric * metric = new L2Metric();
 
 
 

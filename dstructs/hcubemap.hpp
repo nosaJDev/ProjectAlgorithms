@@ -18,6 +18,8 @@ class HypercubeMapping: public PointStruct{
         // number of projected vectors.
         int w; // Window used by the hash functions
         int dimension; // The dimension of the vectors that are projected
+        int maxprobes; // How many cube vertices to search;
+        int M; // How many points to search
 
         // The hash function generator
         LocalityHashFamily * hashfunc;
@@ -32,7 +34,7 @@ class HypercubeMapping: public PointStruct{
     public:
 
         // Con/destructors
-        HypercubeMapping(int, int, int);
+        HypercubeMapping(int, int, int,int, int);
         ~HypercubeMapping();
 
         // This is the preprocessing step
@@ -40,8 +42,8 @@ class HypercubeMapping: public PointStruct{
 
         // These are methods for performing queries
         Vector * approximateNN(Vector *,Metric *);
-        PriorityQueue * approximatekNN(int, Vector *, Metric *);
-        PriorityQueue * approximateRange(double, Vector *, Metric *);
+        PriorityQueue * approximatekNN(Vector *, Metric *);
+        PriorityQueue * approximateRange(float, Vector *, Metric *);
 
 
 };

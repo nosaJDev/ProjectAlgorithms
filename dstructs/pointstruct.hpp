@@ -22,8 +22,8 @@ class PointStruct{
 
         // These are methods for performing queries
         virtual Vector * approximateNN(Vector *,Metric *) = 0;
-        virtual PriorityQueue * approximatekNN(int, Vector *, Metric *) = 0;
-        virtual PriorityQueue * approximateRange(double, Vector *, Metric *) = 0;
+        virtual PriorityQueue * approximatekNN(Vector *, Metric *) = 0;
+        virtual PriorityQueue * approximateRange(float, Vector *, Metric *) = 0;
 
 
 

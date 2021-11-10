@@ -101,13 +101,15 @@ int * inclusiveHamming(int number, int bits, int dist, HashTable * ht){
 }
 
 
-HypercubeMapping::HypercubeMapping(int cdims, int _w, int dims){
+HypercubeMapping::HypercubeMapping(int cdims, int _w, int dims, int probes, int _M){
 
     // This will initiate all the parameters and the function generator
     // First initiate all the parameters
     cubedims = cdims;
     w = _w;
     dimension = dims;
+    maxprobes = probes;
+    M = _M;
 
     // Then initialize the hash function generation
     // We need as many functions as there are cube dimensions
@@ -179,21 +181,24 @@ void HypercubeMapping::addVectorList(List * vlist){
 
 Vector * HypercubeMapping::approximateNN(Vector * q, Metric * metric){
 
-    // Get the hamming distance that you will check
-    int hamming = 0;
-
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);
 
-    // Then retrieve the list of buckets to check according to hamming distance
-    int * bucks = inclusiveHamming(qkey,cubedims, hamming);
+    // Get enough distance to have at least maxprobes
+    int * bucks;
+    int dat = 1;
+    while(true){
+        bucks = inclusiveHamming(qkey,cubedims, dat++);
+        if(bucks[0] >= maxprobes) break;
+        delete[] bucks;
+    }
 
     // After that, create the variables that will hold the nearest neighbor
     Vector * nn;
-    double mindist = 9999999;
+    float mindist = 9999999;
 
     // Finally loop through those buckets to gather the nearest neighbors
-    for(int i = 1; i <= bucks[0]; i++){
+    for(int i = 1; i <= maxprobes; i++){
 
         // Retrieve the bucket we are searching in
         List * bucket = table->getChain(bucks[i]);
@@ -205,7 +210,7 @@ Vector * HypercubeMapping::approximateNN(Vector * q, Metric * metric){
             HashElement * he = (HashElement *) bucket->get(j);
 
             // Check if you are closer than the sofar NN
-            double d = metric->dist(q, (Vector *) he->data);
+            float d = metric->dist(q, (Vector *) he->data);
             if ( mindist > d ){
                 // Replace the NN with the better one
                 mindist = d;
@@ -225,22 +230,27 @@ Vector * HypercubeMapping::approximateNN(Vector * q, Metric * metric){
 
 
 
-PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric * metric){
+PriorityQueue * HypercubeMapping::approximatekNN(Vector * q, Metric * metric){
 
-    // Get the hamming distance that you will check
-    int hamming = 0;
 
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);
 
-    // Then retrieve the list of buckets to check according to hamming distance
-    int * bucks = inclusiveHamming(qkey,cubedims, hamming);
+    // Get enough distance to have at least maxprobes
+    int * bucks;
+    int dat = 1;
+    while(true){
+        bucks = inclusiveHamming(qkey,cubedims, dat++);
+        if(bucks[0] >= maxprobes) break;
+        delete[] bucks;
+    }
 
     // After that create a priority queue to hold the nearest neighbors
-    PriorityQueue * queue = new PriorityQueue(kappa);
+    PriorityQueue * queue = new PriorityQueue(10);
 
     // Finally loop through those buckets to gather the nearest neighbors
-    for(int i = 1; i <= bucks[0]; i++){
+    int tillM = 0;
+    for(int i = 1; i <= maxprobes; i++){
 
         // Retrieve the bucket we are searching in
         List * bucket = table->getChain(bucks[i]);
@@ -255,6 +265,7 @@ PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric *
             // No need to check locality since all elements on
             // the bucket have the same key
             queue->add((void*)he->data, metric->dist(q,(Vector *)he->data));
+            if(++tillM >= M) break;
         }
 
     }
@@ -268,27 +279,32 @@ PriorityQueue * HypercubeMapping::approximatekNN(int kappa, Vector * q, Metric *
 }
 
 
-PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Metric * metric){
+PriorityQueue * HypercubeMapping::approximateRange(float radius, Vector * q, Metric * metric){
 
-    // Get the hamming distance that you will check
-    int hamming = 0;
 
     // First of all find the key of the vector to check
     int qkey = findVectorCubeKey(q);
 
-    // Then retrieve the list of buckets to check according to hamming distance
-    int * bucks = inclusiveHamming(qkey,cubedims, hamming);
+    // Get enough distance to have at least maxprobes
+    int * bucks;
+    int dat = 1;
+    while(true){
+        bucks = inclusiveHamming(qkey,cubedims, dat++);
+        if(bucks[0] >= maxprobes) break;
+        delete[] bucks;
+    }
 
     // After that create a priority queue to hold the nearest neighbors
     PriorityQueue * queue = new PriorityQueue(20);
 
     // Finally loop through those buckets to gather the nearest neighbors
-    for(int i = 1; i <= bucks[0]; i++){
+    for(int i = 1; i <= maxprobes; i++){
 
         // Retrieve the bucket we are searching in
         List * bucket = table->getChain(bucks[i]);
 
         // Loop through all the bucket elements
+        int tillM = 0;
         for(int j = 0; j < bucket->getElems(); j++){
 
             // Find the element
@@ -300,12 +316,14 @@ PriorityQueue * HypercubeMapping::approximateRange(double radius, Vector * q, Me
                 continue;
 
             // Find the distance of the vectors
-            double d = metric->dist(q, v);
+            float d = metric->dist(q, v);
 
             // If the distance is within radius, add the element to the
             // priority queue.
-            if(d < radius)
+            if(d < radius){
                 queue->add((void *) v, d);
+                if(++tillM >= M) break;
+            }
 
         }
 

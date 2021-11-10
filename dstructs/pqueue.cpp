@@ -13,8 +13,8 @@ PriorityQueue::PriorityQueue(int _size){
         array[i] = nullptr;
     }
 
-    // Initiate the hash table for double checking
-    double_check = new HashTable(size);
+    // Initiate the hash table for float checking
+    float_check = new HashTable(size);
 
 
 }
@@ -27,13 +27,13 @@ PriorityQueue::~PriorityQueue(){
     }
     delete[] array;
 
-    // Delete the hash table for double checking
-    delete double_check;
+    // Delete the hash table for float checking
+    delete float_check;
 
 }
 
-void PriorityQueue::doubleArray(){
-    // This will double the array space
+void PriorityQueue::floatArray(){
+    // This will float the array space
     // it is needed for when there is no more space but we are adding elements
 
     // Get the new size and the new array
@@ -65,23 +65,23 @@ int PriorityQueue::getElems(){
 
 }
 
-void PriorityQueue::add(void * elem, double priority){
+void PriorityQueue::add(void * elem, float priority){
 
     // This will add an element to the priority queue
     // Elements that do not fit will be deleted.
 
     // First, check if the element is already present on the priority queue
-    if( double_check->exists(elem, (long long) elem)){
+    if( float_check->exists(elem, (long long) elem)){
         // If it exists, then don't add it again
         return;
     }
 
-    // If it does not exist, mark it as added on the double checker
-    double_check->add(elem, (long long) elem);
+    // If it does not exist, mark it as added on the float checker
+    float_check->add(elem, (long long) elem);
 
-    // Check if you need to double the space to fit
+    // Check if you need to float the space to fit
     if (elems+1 >= size)
-        doubleArray();
+        floatArray();
 
     // Add the element to the last spot
     QueueElement * my_elem = new QueueElement(elem,priority);
@@ -128,7 +128,7 @@ void * PriorityQueue::peek(){
 
 }
 
-double PriorityQueue::peekPriority(){
+float PriorityQueue::peekPriority(){
 
     // It returns the priority of the first element
     // retruns zero if no first element
@@ -180,7 +180,7 @@ void * PriorityQueue::remove(){
         }else{
             // Both children are present
             // Descend to the largest
-            double pri;
+            float pri;
             if (array[2*spot_at]->priority < array[2*spot_at+1]->priority){
                 down_spot = 2*spot_at;
                 pri = array[2*spot_at]->priority;

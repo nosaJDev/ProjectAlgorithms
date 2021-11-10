@@ -3,19 +3,21 @@
 #include <cstring>
 
 
-VectorFile::VectorFile(const char * filename, int dimension){
+VectorFile::VectorFile(const char * filename){
     // This will parse the specified file and save the info on
     // the lists. It is assumed that the file is in the correct
     // format following the assignment instructions.
 
     // Initialize the list
-    vector_list = new List();
+    vector_list = nullptr;
 
     // Open the file for reading
     FILE * file = fopen(filename,"r");
     if (file == nullptr){
-        printf("Could not open file");
+        return;
     }
+
+    vector_list = new List();
 
     // Find out the correct dimension by reading the first line
     dimension = 0;
@@ -39,7 +41,7 @@ VectorFile::VectorFile(const char * filename, int dimension){
     int dims_read = 0; // How many dimensions have you read
     bool read_name = true; // Wether you are reading the label
     char name_buffer[100]; // Buffer for the label
-    double * coord_buffer = new double[dimension];
+    float * coord_buffer = new float[dimension];
 
     // Id variable
     int id_at = 0;
@@ -57,7 +59,7 @@ VectorFile::VectorFile(const char * filename, int dimension){
         }
 
         // Try to read the next coordinate
-        if(fscanf(file,"%lf",coord_buffer+dims_read) == EOF)
+        if(fscanf(file,"%f",coord_buffer+dims_read) == EOF)
             break;
 
         // Increment what you have read
@@ -93,7 +95,7 @@ VectorFile::~VectorFile(){
         delete (Vector *) vector_list->get(i);
 
     }
-    delete vector_list;
+    if(vector_list != nullptr) delete vector_list;
 
 }
 
@@ -102,3 +104,7 @@ List * VectorFile::getVectorList(){
     return vector_list;
 }
 
+int VectorFile::getDimensions(){
+    // Return the dimensions of the vectors processed
+    return dimension;
+}

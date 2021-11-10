@@ -24,7 +24,7 @@ LloydClusterer::LloydClusterer(int d, List * pts, int _k,bool range,PointStruct 
     }
 
     // Initialize the sillouete array
-    sillouete = new double[k];
+    sillouete = new float[k];
 
 }
 
@@ -65,8 +65,8 @@ void LloydClusterer::initialization(Metric * metric){
     }
 
     // Initialize the minimum distance array
-    double * dists = new double[els];
-    double distsum = 0;
+    float * dists = new float[els];
+    float distsum = 0;
 
     // Pick the first centroid at random
     int pick = rand() % els;
@@ -88,7 +88,7 @@ void LloydClusterer::initialization(Metric * metric){
         for(int i = 0; i < els-t; i++){
 
             // First minimum is the first centroid
-            double d = metric->dist(centroids[0],pts[i]);
+            float d = metric->dist(centroids[0],pts[i]);
             dists[i] = d*d;
 
             for(int j = 1; j < t; j++){
@@ -104,10 +104,10 @@ void LloydClusterer::initialization(Metric * metric){
         }
 
         // Then pick one at random with proportionate probability
-        double probdist = distsum*rand()/RAND_MAX;
+        float probdist = distsum*rand()/RAND_MAX;
 
         // Check which one you picked
-        double tempdist = 0;
+        float tempdist = 0;
         for(int i = 0; i < els-t; i++){
             tempdist += dists[i];
             if (tempdist >= probdist){
@@ -161,13 +161,13 @@ void LloydClusterer::directAssignment(Metric * metric){
 
         // Initialize the mindist and the mincluster
         int mincluster = 0;
-        double mindist = metric->dist(p,centroids[0]);
+        float mindist = metric->dist(p,centroids[0]);
 
         // Search for any smaller distances
         for(int j = 1; j < k; j++){
             
             // Calculate the new distance and check if its smaller
-            double d = metric->dist(p,centroids[j]); 
+            float d = metric->dist(p,centroids[j]); 
             if (d < mindist){
                 // Replace with the smaller one
                 mindist = d;
@@ -196,7 +196,7 @@ void LloydClusterer::rangeAssignment(Metric * metric){
     int clustered_els = 0; // How many did you put
 
     // Pick the initial radius
-    double radius = 5.0;
+    float radius = 5.0;
 
     // Create an array to hold the priority queues (as many as the clusters)
     PriorityQueue ** queues = new PriorityQueue*[k];
@@ -220,7 +220,7 @@ void LloydClusterer::rangeAssignment(Metric * metric){
 
                 // Get the vector and the distance
                 Vector * v = (Vector*) elems[j]->data;
-                double d = elems[j]->priority;
+                float d = elems[j]->priority;
 
                 //Count the newly clustered elements
                 if(v->addPossibleCluster(i,d)){
@@ -240,7 +240,7 @@ void LloydClusterer::rangeAssignment(Metric * metric){
         if( clustered_els >= els || now_clustered == 0)
             break;
 
-        // Double the radius and begin anew
+        // float the radius and begin anew
         radius *= 2;
         continue;
 
@@ -256,12 +256,12 @@ void LloydClusterer::rangeAssignment(Metric * metric){
         int cluster = v->getCluster();
         if (cluster == -1){
             // If it does not belong, check every centroid manually
-            double mindist = metric->dist(v,centroids[0]);
+            float mindist = metric->dist(v,centroids[0]);
             cluster = 0;
 
             // Find the minimum through iteration
             for(int j = 1; j < k; j++){
-                double d = metric->dist(v,centroids[j]);
+                float d = metric->dist(v,centroids[j]);
                 if(d < mindist){
                     mindist = d;
                     cluster = j;
@@ -287,9 +287,9 @@ bool LloydClusterer::update(){
 
     // This will update the centroids based on the points that are clustered
 
-    // Initialize a temporary double array for computations
-    double * coordsum = new double[dimension];
-    double maxd = -1; // Calulates the maximum difference of position for centroids
+    // Initialize a temporary float array for computations
+    float * coordsum = new float[dimension];
+    float maxd = -1; // Calulates the maximum difference of position for centroids
 
     // Update every centroid
     for(int i = 0; i < k; i++){
@@ -317,14 +317,14 @@ bool LloydClusterer::update(){
 
         // After that, divide to get the actual coords
         // Compare with the old centroid position to find the terminal condition
-        double movedist = 0;
+        float movedist = 0;
         for(int j = 0; j < dimension; j++){
             
             // Do the division
             coordsum[j] /= pno;
 
             // Add the square difference
-            double diff = coordsum[j]-centroids[i]->getCoord(j);
+            float diff = coordsum[j]-centroids[i]->getCoord(j);
             movedist += diff*diff;
 
             // Replace the coordinate
@@ -342,7 +342,7 @@ bool LloydClusterer::update(){
     delete[] coordsum;
 
     // Check if you reached the threshold to stop
-    double thres = 5.0;
+    float thres = 5.0;
     return maxd <= thres*thres && false;
 
 }
@@ -412,9 +412,9 @@ void LloydClusterer::calculateSillouete(Metric * metric){
 
     // Initialize the temporary values
     int els = points->getElems();
-    double a;
-    double b;
-    double s;
+    float a;
+    float b;
+    float s;
 
     // Reset the sillouete values
     for(int i = 0; i < k; i++)
@@ -434,14 +434,14 @@ void LloydClusterer::calculateSillouete(Metric * metric){
         // Find its two closest clusters
         int first = p->getCluster(), second = -1;
         List * temp;
-        double secondd = 0;
+        float secondd = 0;
         for(int j = 0; j < k; j++){
             
             // Skip your cluster
             if(j == first) continue;
             
             // find the centroid distance
-            double d = metric->dist(p,centroids[j]);
+            float d = metric->dist(p,centroids[j]);
 
             // Replace accordingly
             if(second == -1 || secondd > d){
@@ -506,7 +506,7 @@ void LloydClusterer::calculateSillouete(Metric * metric){
 
 }
 
-double LloydClusterer::getSillouete(int c){
+float LloydClusterer::getSillouete(int c){
 
     // This will return the sillouete of the specified cluster
     // You should calculate those first
@@ -514,10 +514,10 @@ double LloydClusterer::getSillouete(int c){
 
 }
 
-double LloydClusterer::getGlobalSillouete(){
+float LloydClusterer::getGlobalSillouete(){
 
     // This will return the average sillouete for all the clusters
-    double s_ret = 0;
+    float s_ret = 0;
     for(int i = 0; i < k; i++){
         s_ret += sillouete[i]*clusters->getChain(i)->getElems();
     }

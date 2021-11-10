@@ -64,7 +64,7 @@ void List::add(void * elem){
 
     // Adds a new element to front of the list
     
-    // Double size if necessary
+    // float size if necessary
     if(elems == size){
         void ** newarray = new void*[size*2];
         for(int i = 0; i < size; i++)

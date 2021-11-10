@@ -13,8 +13,8 @@ int main(){
     // test_priority_queue(); Passed, don't even doubt it
 
     // test_vector_reading(); Successful
-     test_hash_methods(0,false,true,true); // (LSH) Works flawlessly!
-    // test_hash_methods(1); // (Hypercube) Works as well!
+    //test_hash_methods(0,false,true,true); // (LSH) Works flawlessly!
+    //test_hash_methods(1,false,true,true); // (Hypercube) Works as well!
 
     // test_hamming_calculation(); Passed
 

@@ -19,9 +19,9 @@ LSH::LSH(int _L, int _k,int _w, int buckets, int dim){
     // Reset the inserted vectors counter
     elems = 0;
 
-    // Set the random offset
-    srand(time(nullptr));
-    rand_offset = rand() % 100000;
+    // Set the randoms
+    rands = new int[k];
+    for(int i =0; i < k; i++) rands[i] = (1+rand()%3)*(-1+2*(rand()%2));
 
     // Create the hash tables
     tables = new HashTable*[L];
@@ -30,7 +30,7 @@ LSH::LSH(int _L, int _k,int _w, int buckets, int dim){
     }
 
     // Initiate the hash function generator
-    int maxhashes = 200;
+    int maxhashes = 100;
     hashfunc = new LocalityHashFamily(maxhashes, dimension, w);
 
     // Choose which hash functions will accomodate each level
@@ -65,29 +65,24 @@ LSH::~LSH(){
     // Delete the hash function generator
     delete hashfunc;
 
+    // Delete the randoms
+    delete[] rands;
+
 }
 
-int LSH::getVectorMasterKey(int level, Vector * v){
+long long LSH::getVectorMasterKey(int level, Vector * v){
 
     // This will generate the final key for the vector on the specified level
 
-    // Combine using a mask
-    /*int res = 0;
-    int bitsper = 16/k;
-    int bitmask = 0;
-    for(int i = 0; i < bitsper; i++) bitmask |= 1 << i;*/
+    // Calculate the M value (2^32-5)
+    long long M = 4294967291;
 
-    int res = 0;
+    // Finally add the hash values together
+    long long res = 0;
     for(int i = 0; i < k; i++){
-        int hr =hashfunc->hash(hash_ids[level][i],v);
-        res += hr;
-        //if(hr < 0) hr = -hr;
-        //res = res | (hashfunc->hash(hash_ids[level][i],v) & bitmask);
-        //res = res << bitsper;
+        res = ((res % M)+((hashfunc->hash(hash_ids[level][i],v)*rands[i])%M))%M;
     }
-
-    //printf("res: %d\n",res);
-
+    
     // Produce the key and return it
     return res;
 
@@ -102,7 +97,7 @@ void LSH::placeVectorToBucket(int level, Vector * v){
 
 
     // Generate the key and put to bucket
-    int finalkey = getVectorMasterKey(level, v);
+    long long finalkey = getVectorMasterKey(level, v);
     tables[level]->add((void*)v,finalkey);
 
 }
@@ -132,14 +127,14 @@ Vector * LSH::approximateNN( Vector * q, Metric * metric){
 
     // First create the variables that will hold the nn
     Vector * nn = nullptr;
-    double mindist = 999999;
+    float mindist = 999999;
 
 
     // Then, search the correct bucket for each level
     for(int l = 0; l < L; l++){
         
         // Find the master key for vector q on that level
-        int master_key = getVectorMasterKey(l, q);
+        long long master_key = getVectorMasterKey(l, q);
 
         // Then retrieve the bucket list for that key
         List * bucketlist = tables[l]->getChain(master_key);
@@ -154,7 +149,7 @@ Vector * LSH::approximateNN( Vector * q, Metric * metric){
 
             // Retrieve the vector and find the distance with the metric
             Vector * v = (Vector *) elem->data;
-            double d = metric->dist(v,q);
+            float d = metric->dist(v,q);
 
             // Check if you need to replace the NN
             if ( mindist > d){
@@ -173,18 +168,18 @@ Vector * LSH::approximateNN( Vector * q, Metric * metric){
 
 
 
-PriorityQueue * LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
+PriorityQueue * LSH::approximatekNN(Vector * q, Metric * metric){
 
     // This will look up the buckets, and return the kappa nearest neigbors
 
     // First create a priority queue to hold the potentials
-    PriorityQueue * queue = new PriorityQueue(kappa);
+    PriorityQueue * queue = new PriorityQueue(10);
 
     // Then, search the correct bucket for each level
     for(int l = 0; l < L; l++){
         
         // Find the master key for vector q on that level
-        int master_key = getVectorMasterKey(l, q);
+        long long  master_key = getVectorMasterKey(l, q);
 
         // Then retrieve the bucket list for that key
         List * bucketlist = tables[l]->getChain(master_key);
@@ -199,7 +194,7 @@ PriorityQueue * LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
 
             // Retrieve the vector and find the distance with the metric
             Vector * v = (Vector *) elem->data;
-            double dist = metric->dist(v,q);
+            float dist = metric->dist(v,q);
 
             // Insert into the priority queue
             // dist is the priority (less is greater priority)
@@ -216,7 +211,7 @@ PriorityQueue * LSH::approximatekNN(int kappa, Vector * q, Metric * metric){
 
 }
 
-PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric){
+PriorityQueue * LSH::approximateRange(float radius, Vector * q, Metric * metric){
 
     // This will look up the buckets, and return all the vectors at a range
 
@@ -229,7 +224,7 @@ PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric
     for(int l = 0; l < L; l++){
         
         // Find the master key for vector q on that level
-        int master_key = getVectorMasterKey(l, q);
+        long long master_key = getVectorMasterKey(l, q);
 
         // Then retrieve the bucket list for that key
         List * bucketlist = tables[l]->getChain(master_key);
@@ -250,7 +245,7 @@ PriorityQueue * LSH::approximateRange(double radius, Vector * q, Metric * metric
                 continue;
 
             // Calculate the distance
-            double dist = metric->dist(v,q);
+            float dist = metric->dist(v,q);
 
             // If the distance is within the radius insert at the priority queue
             // dist is the priority (less is greater priority)

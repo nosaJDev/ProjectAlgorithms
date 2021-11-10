@@ -12,14 +12,16 @@ class VectorFile{
 
         // Lists for storing the vector and naming
         List * vector_list;
+        int dimension;
 
     public:
 
-        VectorFile(const char *,int);
+        VectorFile(const char *);
         ~VectorFile();
 
         // Getters
         List * getVectorList();
+        int getDimensions();
 
 
 };

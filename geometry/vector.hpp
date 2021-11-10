@@ -1,5 +1,6 @@
 #ifndef _vec
 #define _vec
+#include <cstdio>
 
 class Vector{
 
@@ -14,36 +15,36 @@ class Vector{
         int id = -1;
 
         // Coordinates and dimensions
-        double * coords;
+        float * coords;
         int size;
         char * label;
 
         // These are used in clustering
         int cluster;
-        double clusterdist;
+        float clusterdist;
     
     public:
 
         // Con/destructor
-        Vector(int, double * = nullptr, char * = nullptr,int = -1);
+        Vector(int, float * = nullptr, char * = nullptr,int = -1);
         ~Vector();
 
         // Getters and setters
         int getSize();
-        double getCoord(int);
-        void setCoord(int, double);
+        float getCoord(int);
+        void setCoord(int, float);
         char * getLabel();
 
         // Math operations
-        double dotProduct(Vector *);
+        float dotProduct(Vector *);
 
         // Other operations
         void paste(Vector *);
 
         // Operations used in range clustering
-        bool addPossibleCluster(int, double);
+        bool addPossibleCluster(int, float);
         int getCluster();
-        double getClusterDist();
+        float getClusterDist();
         void resetCluster();
 
         // Identification getters
@@ -51,6 +52,7 @@ class Vector{
 
         // Used for debugging
         void print();
+        void printFile(FILE *);
 
 
 };

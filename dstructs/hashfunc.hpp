@@ -18,7 +18,7 @@ class LocalityHashFamily{
 
         // Variables for storing the hash family data
         Vector ** vectors;
-        double * tvalues;
+        float * tvalues;
 
         // Parameters set by the user
         int w; // The window that is used in calcuations
