@@ -151,7 +151,7 @@ int main(int argc,char** argv){
 
                 // Write the stats
                 fprintf(outfile,"Nearest neighbor-1: %s\n",(nn!=nullptr)?nn->getLabel():"none");
-                fprintf(outfile,"distanceLSH: %f\n",nnd);
+                fprintf(outfile,"distanceCube: %f\n",nnd);
                 fprintf(outfile,"distanceTrue: %f\n",tnnd);
             }
 
@@ -160,6 +160,7 @@ int main(int argc,char** argv){
             fprintf(outfile,"tTrue: %lf\n",ttruenn);
 
             // Write the r-near results
+            fprintf(outfile,"R-near neighbors\n");
             while(rnear->getElems() > 0){
                 
                 // Pop the next r-near and write to file

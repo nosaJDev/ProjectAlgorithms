@@ -127,7 +127,7 @@ int main(int argc,char** argv){
     // Print the results for every cluster
     for(int i = 0; i < K; i++){
 
-        fprintf(outfile,"CLUSTER-%d {",i+1);
+        fprintf(outfile,"CLUSTER-%d { %d,",i+1,clusterer->getCluster(i)->getElems());
         clusterer->getCentroid(i)->printFile(outfile);
 
         // Check if you need to print all the vector labels aswell

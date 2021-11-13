@@ -1,2 +1,0 @@
--Test List and ListNode
--Test hashtable

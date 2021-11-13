@@ -27,6 +27,7 @@ class LloydClusterer{
 
         // Sillouette variables
         float * sillouete;
+        float globalSillouete;
 
         // Internal working functions
         void initialization(Metric *);

@@ -170,8 +170,10 @@ int main(int argc,char** argv){
             // Write the times
             fprintf(outfile,"tLSH: %lf\n",tnearest);
             fprintf(outfile,"tTrue: %lf\n",ttruenn);
+            
 
             // Write the r-near results
+            fprintf(outfile,"R-near neighbors\n");
             while(rnear->getElems() > 0){
                 
                 // Pop the next r-near and write to file

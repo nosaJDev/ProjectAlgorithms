@@ -342,8 +342,8 @@ bool LloydClusterer::update(){
     delete[] coordsum;
 
     // Check if you reached the threshold to stop
-    float thres = 5.0;
-    return maxd <= thres*thres && false;
+    float thres = 1.0;
+    return maxd <= thres*thres;
 
 }
 
@@ -419,6 +419,7 @@ void LloydClusterer::calculateSillouete(Metric * metric){
     // Reset the sillouete values
     for(int i = 0; i < k; i++)
         sillouete[i] = 0;
+    globalSillouete = 0;
 
     int dots = 40;
     int dot_per = els/dots;
@@ -481,6 +482,7 @@ void LloydClusterer::calculateSillouete(Metric * metric){
 
         // Add that to the silouete of the appropriate cluster
         sillouete[p->getCluster()] += s;
+        globalSillouete += s;
 
 
         if((i+1)/dot_per > ddots){
@@ -502,7 +504,7 @@ void LloydClusterer::calculateSillouete(Metric * metric){
     // At the end divide to get the correct results
     for(int i = 0; i < k; i++)
         sillouete[i] /= clusters->getChain(i)->getElems();
-
+    globalSillouete /= points->getElems();
 
 }
 
@@ -517,12 +519,6 @@ float LloydClusterer::getSillouete(int c){
 float LloydClusterer::getGlobalSillouete(){
 
     // This will return the average sillouete for all the clusters
-    float s_ret = 0;
-    for(int i = 0; i < k; i++){
-        s_ret += sillouete[i]*clusters->getChain(i)->getElems();
-    }
-    s_ret /= points->getElems();
-    return s_ret;
-
+    return globalSillouete;
 
 }
