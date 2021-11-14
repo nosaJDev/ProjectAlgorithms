@@ -34,7 +34,6 @@ VectorFile::VectorFile(const char * filename){
         if (c == '\n')
             break;
     }
-    printf("The dimensions are %d\n",dimension);
     rewind(file);
 
     // Start reading the file

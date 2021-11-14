@@ -153,8 +153,12 @@ void LloydClusterer::directAssignment(Metric * metric){
     // This will compare distances with every centroid
     // and decide which one to put each point to
 
+    
+
     // Assign every point
     for(int i = 0; i < points->getElems(); i++){
+
+        
 
         // Get the point
         Vector * p = (Vector*) points->get(i);
@@ -180,6 +184,8 @@ void LloydClusterer::directAssignment(Metric * metric){
         p->addPossibleCluster(mincluster,mindist);
 
     }
+
+
 
 }
 
@@ -357,9 +363,16 @@ int LloydClusterer::performClustering(Metric * metric,int times){
     // First initialize the clustering
     initialization(metric);
 
+    // Print out a nice little message
+    printf("Performing clustering:\n");
+
     // Then perform the two step loop
     int i = 0;
     while(i != times){
+
+        // Print the progress
+        printf("\rProgress %d/%d\n",i,times);
+        fflush(stdout);
 
         // Reset the clusters on each vector first
         for(int j = 0; j < points->getElems();j++){
@@ -371,6 +384,7 @@ int LloydClusterer::performClustering(Metric * metric,int times){
         
         // Check if you need to stop after the update
         if ( update()){
+            printf("Stopped after terminal condition\n");
             break;
         }
 
@@ -425,6 +439,8 @@ void LloydClusterer::calculateSillouete(Metric * metric){
     int dot_per = els/dots;
     int ddots = 0;
 
+    // Print out a nice little message
+    printf("Calculating Sillouette:\n");
 
     // Perform for each vector
     for(int i = 0; i < els; i++){

@@ -1,7 +1,5 @@
-all: prog lsh cube cluster clean
+all: lsh cube cluster clean
 
-prog: main.cpp clustering.o hashfunc.o hashtable.o hcubemap.o list.o lsh.o pqueue.o vectorfile.o metric.o vector.o
-	g++ -o prog main.cpp clustering.o hashfunc.o hashtable.o hcubemap.o list.o lsh.o pqueue.o vectorfile.o metric.o vector.o
 lsh: lsh_main.cpp clustering.o hashfunc.o hashtable.o hcubemap.o list.o lsh.o pqueue.o vectorfile.o metric.o vector.o
 	g++ -o lsh lsh_main.cpp clustering.o hashfunc.o hashtable.o hcubemap.o list.o lsh.o pqueue.o vectorfile.o metric.o vector.o
 cube: cube_main.cpp clustering.o hashfunc.o hashtable.o hcubemap.o list.o lsh.o pqueue.o vectorfile.o metric.o vector.o
